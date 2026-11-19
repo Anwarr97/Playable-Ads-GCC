@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Playable vs Video: Break-Even</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a single reading column — thesis, the two inputs that matter, a live break-even verdict, then the full model and its sources. */
+:root{
+  --bg:#F4F5F7; --panel:#FFFFFF; --ink:#111622; --fg:#1B2232; --muted:#5C6880; --line:#DFE3EA;
+  --video:#8A94A8; --play:#FF6A2B; --play-soft:#FFEDE4; --good:#0E9F6E; --warn:#B4541E;
+  --grid:#E8EBF0;
+  --display:"Sora",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:"Inter","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1117; --panel:#161B24; --ink:#F2F5FA; --fg:#E6EBF3; --muted:#92A0B8; --line:#262E3C;
+  --video:#616E86; --play:#FF8551; --play-soft:#2A1A12; --good:#34D399; --warn:#F0A070;
+  --grid:#1E2531; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1117; --panel:#161B24; --ink:#F2F5FA; --fg:#E6EBF3; --muted:#92A0B8; --line:#262E3C;
+  --video:#616E86; --play:#FF8551; --play-soft:#2A1A12; --good:#34D399; --warn:#F0A070;
+  --grid:#1E2531; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 72px}
+.wrap{max-width:760px;margin:0 auto}
+h1,h2,h3,.num{font-family:var(--display);text-wrap:balance}
+h1{font-size:clamp(28px,5.6vw,42px);line-height:1.08;font-weight:800;letter-spacing:-.02em;margin:0 0 14px}
+h2{font-size:21px;font-weight:700;margin:0 0 4px;letter-spacing:-.01em}
+h3{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+p{margin:0 0 14px}
+
+header{padding-block:44px 10px}
+.eyebrow{font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--play)}
+.lede{font-size:18px;color:var(--fg)}
+.lede b{color:var(--ink)}
+.by{margin-top:16px;color:var(--muted);font-size:14px}
+
+section{margin-top:28px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+
+/* controls */
+.ctrl{display:grid;gap:7px;margin-bottom:20px}
+.ctrl:last-child{margin-bottom:0}
+.ctrl .top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.ctrl label{font-family:var(--display);font-weight:600;font-size:15px;color:var(--ink)}
+.ctrl .val{font-family:var(--display);font-weight:700;font-size:17px;font-variant-numeric:tabular-nums;color:var(--play)}
+.ctrl .note{font-size:13px;color:var(--muted);line-height:1.45}
+input[type=range]{width:100%;accent-color:var(--play);height:26px;margin:0}
+.seg{display:flex;flex-wrap:wrap;gap:7px}
+.seg button{flex:1 1 auto;min-width:84px;background:transparent;border:1.5px solid var(--line);color:var(--fg);
+  font:600 14px var(--body);padding:9px 10px;border-radius:9px;cursor:pointer}
+.seg button[aria-pressed="true"]{border-color:var(--play);background:var(--play-soft);color:var(--ink);font-weight:700}
+.seg button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--play);outline-offset:2px}
+
+/* verdict */
+.verdict{background:var(--panel);border:2px solid var(--play);border-radius:16px;padding:24px;text-align:center}
+.verdict .k{font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.verdict .big{font-family:var(--display);font-size:clamp(34px,8vw,54px);font-weight:800;line-height:1.05;color:var(--play);
+  font-variant-numeric:tabular-nums;margin:8px 0}
+.verdict .exp{color:var(--muted);font-size:15px;max-width:44ch;margin:0 auto}
+.verdict.always{border-color:var(--good)} .verdict.always .big{color:var(--good)}
+
+/* chart */
+.chartbox{margin-top:18px}
+svg{display:block;width:100%;height:auto;max-width:100%}
+.legend{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-top:10px;font-size:13px;font-weight:600;color:var(--muted)}
+.legend i{display:inline-block;width:13px;height:4px;border-radius:2px;margin-right:6px;vertical-align:middle}
+
+/* results table */
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{padding:11px 8px;text-align:right;font-size:15px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left;font-weight:500;color:var(--muted)}
+thead th{font-family:var(--display);font-size:13px;font-weight:700;color:var(--ink);border-bottom:2px solid var(--line)}
+thead th.v{color:var(--video)} thead th.p{color:var(--play)}
+tbody tr:last-child td{border-bottom:0;font-weight:700;font-size:17px;color:var(--ink)}
+td b{font-weight:700}
+.win{color:var(--good)}
+.scroller{overflow-x:auto}
+
+details{margin-top:14px;border-top:1px solid var(--line);padding-top:14px}
+summary{cursor:pointer;font-family:var(--display);font-weight:600;font-size:15px;color:var(--ink)}
+details .in{padding-top:14px}
+.src{font-size:13.5px;color:var(--muted);margin:0 0 10px;padding-left:16px;position:relative;line-height:1.5}
+.src:before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;background:var(--play)}
+.src a{color:inherit}
+.caveat{background:var(--play-soft);border-radius:12px;padding:16px;font-size:14.5px;color:var(--fg);line-height:1.55}
+.caveat b{color:var(--ink)}
+footer{margin-top:34px;color:var(--muted);font-size:13.5px;text-align:center;line-height:1.6}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Playable Factory · GCC</div>
+  <h1>A playable costs more to make and less per result. Here is where it flips.</h1>
+  <p class="lede">Most comparisons of this format quote a lift number and stop. That is not how a media buyer decides. The question is not <b>which format is better</b> — it is <b>at what spend does the higher build cost pay itself back</b>. Move the two sliders and find out for your own budget.</p>
+  <p class="by">Mahmoud Anwar · November 2026 · all defaults are sourced at the bottom, and every one of them is yours to change</p>
+</header>
+
+<section>
+  <div class="card">
+    <h3>Your numbers</h3>
+
+    <div class="ctrl">
+      <div class="top"><label for="budget">Media budget for the campaign</label><span class="val" id="vbudget">$50,000</span></div>
+      <input type="range" id="budget" min="5000" max="400000" step="5000" value="50000">
+      <div class="note">What you would put behind the creative, excluding what it cost to build.</div>
+    </div>
+
+    <div class="ctrl">
+      <div class="top"><label for="lift">Playable conversion lift over video</label><span class="val" id="vlift">+32%</span></div>
+      <input type="range" id="lift" min="0" max="200" step="1" value="32">
+      <div class="note">The only genuinely contested number in this model. +32% is Liftoff's Creative Index figure, the most conservative one in circulation; vendor blogs claim up to +319%. Start low.</div>
+    </div>
+
+    <div class="ctrl">
+      <div class="top"><label>Market</label><span class="val" id="vcpm">$12.00 CPM</span></div>
+      <div class="seg" id="mkt">
+        <button data-cpm="12" aria-pressed="true">Saudi · Meta</button>
+        <button data-cpm="5.5">Saudi · TikTok</button>
+        <button data-cpm="5.2">Saudi · Snap</button>
+        <button data-cpm="10">UAE · Meta</button>
+        <button data-cpm="3.2">Egypt · Meta</button>
+      </div>
+    </div>
+
+    <details>
+      <summary>Open the full model</summary>
+      <div class="in">
+        <div class="ctrl">
+          <div class="top"><label for="pvid">Video production</label><span class="val" id="vpvid">$5,000</span></div>
+          <input type="range" id="pvid" min="0" max="40000" step="500" value="5000">
+          <div class="note">One short brand film. Agency video is quoted per finished minute, so this moves a long way depending on whether you are shooting or animating.</div>
+        </div>
+        <div class="ctrl">
+          <div class="top"><label for="pplay">Playable production</label><span class="val" id="vpplay">$8,000</span></div>
+          <input type="range" id="pplay" min="0" max="40000" step="500" value="8000">
+          <div class="note">A brand-grade custom build, deliberately set above the $3k–$5k quoted for game playables. Slide it down to see what a cheaper build, or reusing one across campaigns, does to the break-even.</div>
+        </div>
+        <div class="ctrl">
+          <div class="top"><label for="ctr">Video click-through rate</label><span class="val" id="vctr">1.00%</span></div>
+          <input type="range" id="ctr" min="10" max="400" step="5" value="100">
+        </div>
+        <div class="ctrl">
+          <div class="top"><label for="cvr">Click-to-conversion rate</label><span class="val" id="vcvr">8.0%</span></div>
+          <input type="range" id="cvr" min="5" max="400" step="5" value="80">
+          <div class="note">Applied to both formats. The playable's advantage is carried entirely by the lift slider above, so nothing is double-counted.</div>
+        </div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section>
+  <div class="verdict" id="verdict">
+    <div class="k" id="vk">Break-even media spend</div>
+    <div class="big" id="vbig">$0</div>
+    <p class="exp" id="vexp"></p>
+  </div>
+
+  <div class="chartbox card" style="margin-top:14px">
+    <h3>Cost per conversion as spend grows</h3>
+    <svg id="chart" viewBox="0 0 680 300" role="img" aria-label="Cost per conversion against media spend, video versus playable"></svg>
+    <div class="legend">
+      <span><i style="background:var(--video)"></i>Video</span>
+      <span><i style="background:var(--play)"></i>Playable</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="card">
+    <h3>At your budget</h3>
+    <div class="scroller">
+      <table>
+        <thead><tr><th>Per campaign</th><th class="v">Video</th><th class="p">Playable</th></tr></thead>
+        <tbody>
+          <tr><td>Impressions</td><td id="r-imp-v">—</td><td id="r-imp-p">—</td></tr>
+          <tr><td>Conversions</td><td id="r-cnv-v">—</td><td id="r-cnv-p">—</td></tr>
+          <tr><td>Build cost</td><td id="r-bld-v">—</td><td id="r-bld-p">—</td></tr>
+          <tr><td>Total cost</td><td id="r-tot-v">—</td><td id="r-tot-p">—</td></tr>
+          <tr><td>Cost per conversion</td><td id="r-cpa-v">—</td><td id="r-cpa-p">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="card">
+    <h3>Where the defaults come from</h3>
+    <p class="src"><b>Conversion lift (+32%)</b> — Liftoff Creative Index, as reported in independent summaries of playable versus video performance. Competing figures range from +32% to +319%; the lower bound is used here deliberately. <a href="https://www.seepia.com/insights/playable-ads-vs-video-ads-2026-data">Seepia</a>, <a href="https://hookin.io/blog/playable-ads-vs-every-other-ad-format">Hookin</a></p>
+    <p class="src"><b>Playable production ($3k–$5k)</b> — AppAgent puts external playable production at $3,000–$5,000 per creative with a two-to-four week turnaround; complex custom builds run higher. <a href="https://appagent.com/blog/what-are-playable-ads/">AppAgent</a></p>
+    <p class="src"><b>Video production</b> — agency video is normally quoted per finished minute, at roughly $3,000–$20,000. A single short ad sits at the low end of that. <a href="https://en.wikipedia.org/wiki/Video_production">Industry pricing guides</a></p>
+    <p class="src"><b>GCC CPMs</b> — Meta in Saudi Arabia at roughly $8–15 and the UAE $6.5–12; TikTok and Snapchat run below Meta in the same markets. Agency-reported, directional only. <a href="https://www.bimogroup.co/blog/meta-ads-benchmarks-gulf">BIMO</a>, <a href="https://23hublab.com/meta-ads-benchmarks-across-gcc-markets/">23HubLab</a></p>
+    <p class="src"><b>Ramadan</b> — Meta CPMs across GCC markets averaged about 68% above non-Ramadan levels in 2026, up from 54% in 2024. Worth modelling separately before a seasonal campaign. <a href="https://www.bimogroup.co/blog/meta-ads-benchmarks-gulf">BIMO</a></p>
+
+    <div class="caveat">
+      <b>What this model does not know.</b> Every published benchmark for this format comes from a company that sells the format, and the spread between them is far too wide to treat any single figure as fact. Non-gaming verticals are thinner still — most of the data is from mobile games. So this calculator does not tell you what a playable will do. It tells you what has to be true for one to pay off at your spend, and that is a question a pilot answers, not a deck.
+    </div>
+  </div>
+</section>
+
+<footer>
+  Built by Mahmoud Anwar for a Playable Factory GCC awareness plan.<br>
+  Change any assumption you disagree with — the whole point is that the numbers are yours.
+</footer>
+</div>
+
+<script>
+(function(){
+  var $=function(s){return document.querySelector(s)};
+  var S={budget:50000,lift:32,cpm:12,pvid:5000,pplay:8000,ctr:100,cvr:80};
+  var money=function(n){
+    n=Math.round(n);
+    if(Math.abs(n)>=1000000) return '$'+(n/1000000).toFixed(n%1000000===0?0:1)+'M';
+    return '$'+n.toLocaleString('en-US');
+  };
+  var money2=function(n){ return '$'+n.toFixed(2); };
+  var int=function(n){ return Math.round(n).toLocaleString('en-US'); };
+
+  function calc(budget){
+    var imp=budget/S.cpm*1000;
+    var ctr=S.ctr/10000, cvr=S.cvr/1000;        // sliders are in tenths of a percent
+    var rv=ctr*cvr;                              // conversions per impression, video
+    var rp=rv*(1+S.lift/100);                    // playable
+    var cv=imp*rv, cp=imp*rp;
+    return {imp:imp, cv:cv, cp:cp,
+            tv:budget+S.pvid, tp:budget+S.pplay,
+            cpav:cv>0?(budget+S.pvid)/cv:Infinity,
+            cpap:cp>0?(budget+S.pplay)/cp:Infinity};
+  }
+  // break-even: rv*(B+Pp) = rp*(B+Pv)  =>  B = (rv*Pp - rp*Pv) / (rp - rv)
+  function breakEven(){
+    var ctr=S.ctr/10000, cvr=S.cvr/1000, rv=ctr*cvr, rp=rv*(1+S.lift/100);
+    if(rp<=rv) return null;                      // no lift: the cheaper build always wins
+    return (rv*S.pplay - rp*S.pvid)/(rp-rv);
+  }
+
+  function chart(be){
+    var w=680,h=300,ml=66,mr=14,mt=14,mb=42;
+    // Log x: the curves are hyperbolas, so almost all the movement sits in the low budgets.
+    var minB=1000, maxB=Math.max(S.budget*3, (be&&be>0?be*12:0), 150000);
+    var lo=Math.log(minB), hi=Math.log(maxB);
+    var X=function(b){return ml+(Math.log(Math.max(b,minB))-lo)/(hi-lo)*(w-ml-mr)};
+    // Cap the y axis so the flat, interesting part of the curve fills the box.
+    var floorCpa=calc(maxB).cpav;
+    var maxY=Math.min(calc(minB).cpav, floorCpa*7)||1;
+    var Y=function(v){return mt+(1-Math.min(v,maxY)/maxY)*(h-mt-mb)};
+    var pts=[];
+    for(var i=0;i<=80;i++){
+      var b=Math.exp(lo+(hi-lo)*i/80);
+      var r=calc(b);
+      pts.push({b:b,v:r.cpav,p:r.cpap});
+    }
+    var path=function(k){
+      return pts.map(function(d,i){return (i?'L':'M')+X(d.b).toFixed(1)+' '+Y(d[k]).toFixed(1)}).join(' ');
+    };
+    var g='';
+    for(var t=0;t<=4;t++){
+      var yv=maxY*t/4, y=Y(yv);
+      g+='<line x1="'+ml+'" y1="'+y.toFixed(1)+'" x2="'+(w-mr)+'" y2="'+y.toFixed(1)+'" stroke="var(--grid)" stroke-width="1"/>'
+       + '<text x="'+(ml-9)+'" y="'+(y+4).toFixed(1)+'" text-anchor="end" font-size="12" fill="var(--muted)" font-family="Inter,sans-serif">'+money2(yv)+'</text>';
+    }
+    [1000,5000,20000,100000,500000].forEach(function(bv){
+      if(bv<minB||bv>maxB) return;
+      var x=X(bv);
+      g+='<line x1="'+x.toFixed(1)+'" y1="'+mt+'" x2="'+x.toFixed(1)+'" y2="'+(h-mb)+'" stroke="var(--grid)" stroke-width="1"/>'
+       + '<text x="'+x.toFixed(1)+'" y="'+(h-mb+22)+'" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="Inter,sans-serif">'+money(bv)+'</text>';
+    });
+    g+='<text x="'+(ml+(w-ml-mr)/2)+'" y="'+(h-4)+'" text-anchor="middle" font-size="12" font-weight="600" fill="var(--muted)" font-family="Inter,sans-serif">media spend</text>';
+    g+='<path d="'+path('v')+'" fill="none" stroke="var(--video)" stroke-width="2.5" stroke-linejoin="round"/>';
+    g+='<path d="'+path('p')+'" fill="none" stroke="var(--play)" stroke-width="3" stroke-linejoin="round"/>';
+    if(be&&be>minB&&be<maxB){
+      var bx=X(be);
+      g+='<line x1="'+bx.toFixed(1)+'" y1="'+mt+'" x2="'+bx.toFixed(1)+'" y2="'+(h-mb)+'" stroke="var(--play)" stroke-width="1.5" stroke-dasharray="5 4" opacity=".8"/>';
+      var anchor = bx>w-150?'end':'start', dx = bx>w-150? -8 : 8;
+      g+='<text x="'+(bx+dx).toFixed(1)+'" y="'+(mt+16)+'" text-anchor="'+anchor+'" font-size="12.5" font-weight="700" fill="var(--play)" font-family="Sora,sans-serif">break-even '+money(be)+'</text>';
+    }
+    // marker for the current budget
+    var cx=X(S.budget), cur=calc(S.budget);
+    if(isFinite(cur.cpap)) g+='<circle cx="'+cx.toFixed(1)+'" cy="'+Y(cur.cpap).toFixed(1)+'" r="5" fill="var(--play)"/>';
+    if(isFinite(cur.cpav)) g+='<circle cx="'+cx.toFixed(1)+'" cy="'+Y(cur.cpav).toFixed(1)+'" r="5" fill="var(--video)"/>';
+    $('#chart').innerHTML=g;
+  }
+
+  function render(){
+    $('#vbudget').textContent=money(S.budget);
+    $('#vlift').textContent='+'+S.lift+'%';
+    $('#vcpm').textContent=money2(S.cpm)+' CPM';
+    $('#vpvid').textContent=money(S.pvid);
+    $('#vpplay').textContent=money(S.pplay);
+    $('#vctr').textContent=(S.ctr/100).toFixed(2)+'%';
+    $('#vcvr').textContent=(S.cvr/10).toFixed(1)+'%';
+
+    var r=calc(S.budget), be=breakEven();
+    $('#r-imp-v').textContent=int(r.imp); $('#r-imp-p').textContent=int(r.imp);
+    $('#r-cnv-v').textContent=int(r.cv);
+    $('#r-cnv-p').innerHTML='<b>'+int(r.cp)+'</b>';
+    $('#r-bld-v').textContent=money(S.pvid); $('#r-bld-p').textContent=money(S.pplay);
+    $('#r-tot-v').textContent=money(r.tv);   $('#r-tot-p').textContent=money(r.tp);
+    var win=r.cpap<r.cpav;
+    $('#r-cpa-v').innerHTML=isFinite(r.cpav)?(win?money2(r.cpav):'<b class="win">'+money2(r.cpav)+'</b>'):'—';
+    $('#r-cpa-p').innerHTML=isFinite(r.cpap)?(win?'<b class="win">'+money2(r.cpap)+'</b>':money2(r.cpap)):'—';
+
+    var vd=$('#verdict');
+    if(be===null){
+      vd.className='verdict';
+      $('#vk').textContent='No lift, no case';
+      $('#vbig').textContent='—';
+      $('#vexp').textContent='With the lift set to zero the playable is just a more expensive way to buy the same result. The lift is the whole argument, which is why a pilot has to measure it rather than assume it.';
+    } else if(be<=0){
+      vd.className='verdict always';
+      $('#vk').textContent='Break-even media spend';
+      $('#vbig').textContent='Any budget';
+      $('#vexp').textContent='At these assumptions the playable is cheaper per conversion from the first dollar, because it costs no more to build than the video it replaces.';
+    } else {
+      vd.className='verdict';
+      $('#vk').textContent='Break-even media spend';
+      $('#vbig').textContent=money(be);
+      var over=S.budget>=be;
+      $('#vexp').textContent=over
+        ? 'Your budget of '+money(S.budget)+' is above it, so the extra '+money(S.pplay-S.pvid)+' of build cost is paid back and the playable comes out cheaper per conversion.'
+        : 'Your budget of '+money(S.budget)+' is below it. Under these assumptions the build cost would not be earned back — either raise the spend, reuse the build across campaigns, or negotiate the production down.';
+    }
+    chart(be);
+  }
+
+  [['budget','budget'],['lift','lift'],['pvid','pvid'],['pplay','pplay'],['ctr','ctr'],['cvr','cvr']].forEach(function(p){
+    var el=document.getElementById(p[0]);
+    el.addEventListener('input',function(){ S[p[1]]=+el.value; render(); });
+  });
+  document.querySelectorAll('#mkt button').forEach(function(b){
+    b.addEventListener('click',function(){
+      document.querySelectorAll('#mkt button').forEach(function(o){o.setAttribute('aria-pressed','false')});
+      b.setAttribute('aria-pressed','true'); S.cpm=+b.dataset.cpm; render();
+    });
+  });
+  render();
+  window.addEventListener('resize',render);
+})();
+</script>
+</body>
+</html>
