@@ -32,6 +32,25 @@ p{margin:0 0 16px}
 a{color:var(--play2)}
 strong{color:var(--head);font-weight:600}
 
+/* chapter nav: sticky under the phone's status bar, scrolls sideways when it runs out of room */
+.chapters{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(12,15,22,.93);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);margin:0 -4px;padding:10px 4px}
+.chapters .inner{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.chapters .inner::-webkit-scrollbar{display:none}
+.chapters a{flex:0 0 auto;font-family:var(--display);font-size:13px;font-weight:600;color:var(--muted);
+  text-decoration:none;padding:7px 13px;border-radius:999px;border:1px solid transparent;white-space:nowrap}
+.chapters a:hover{color:var(--head);border-color:var(--line)}
+.chapters a.here{color:var(--head);background:var(--soft);border-color:rgba(255,106,43,.45)}
+section[id]{scroll-margin-top:72px}
+
+/* contents card on the hero */
+.toc{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:28px}
+.toc a{display:block;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+  text-decoration:none;color:inherit}
+.toc a:hover{border-color:rgba(255,106,43,.5)}
+.toc a b{display:block;font-family:var(--display);font-size:15px;color:var(--head);font-weight:700}
+.toc a span{display:block;font-size:13.5px;color:var(--muted);margin-top:3px}
+
 header{padding-block:56px 12px;border-bottom:1px solid var(--line)}
 .kicker{font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--play)}
 .lede{font-size:20px;color:var(--fg);max-width:60ch}
@@ -127,6 +146,26 @@ td b{color:var(--head)}
   border:1px solid var(--line)}
 .film .filmnote{margin:16px auto 0;max-width:56ch;text-align:center;font-size:14.5px;color:var(--faint);line-height:1.6}
 
+.posts{display:grid;gap:10px;margin-top:8px}
+.post{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.post>.top{display:grid;grid-template-columns:34px minmax(0,1fr);gap:4px 14px;padding:18px 20px;align-items:start}
+.post .idx{font-family:var(--display);font-size:15px;font-weight:800;color:var(--play);padding-top:2px}
+.post .hook{font-size:17px;color:var(--head);line-height:1.75;font-weight:500}
+.post .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;margin-top:10px}
+.post .fmt{font-family:var(--display);font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:3px 8px}
+.post .role{font-size:14.5px;color:var(--muted)}
+.post details{margin:0}
+.post summary{cursor:pointer;list-style:none;padding:13px 20px;border-top:1px solid var(--line);font-family:var(--display);font-size:13.5px;font-weight:700;color:var(--play2)}
+.post summary::-webkit-details-marker{display:none}
+.post summary:after{content:" \2193"}
+.post details[open] summary:after{content:" \2191"}
+.draft{padding:16px 20px 20px;white-space:pre-wrap;font-size:15.5px;line-height:1.9;color:var(--fg);direction:rtl;text-align:right;border-top:1px solid var(--line)}
+.draft .cm{display:block;margin-top:18px;padding-top:14px;border-top:1px dashed var(--line);font-size:14px;color:var(--faint);direction:ltr;text-align:left;line-height:1.6}
+.rules{margin-top:16px;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:22px}
+.rules ul{margin:0;padding-left:20px;font-size:15.5px;color:var(--muted)}
+.rules li{margin-bottom:10px}
+.rules li b{color:var(--head)}
+
 .ask{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:26px}
 .ask ol{margin:0;padding-left:20px}
 .ask li{margin-bottom:14px;font-size:16.5px}
@@ -147,9 +186,33 @@ footer b{color:var(--head);font-family:var(--display)}
   <p class="lede">A plan for putting non-gaming playables in front of GCC brands — and the first pieces of it, built rather than described. Five of the playables on this page are real. Play one.</p>
   <p class="by"><b>Mahmoud Anwar</b> · Business Development, GCC &amp; Egypt<br>
   Prepared for Nil Zor and Baran Aybars, following the GCC sales conversation.</p>
+
+  <div class="toc">
+    <a href="#diagnosis"><b>The argument</b><span>Why the format never gets bought</span></a>
+    <a href="#play"><b>Play them</b><span>Five working playables</span></a>
+    <a href="#numbers"><b>The numbers</b><span>Break-even calculator</span></a>
+    <a href="#film"><b>The film</b><span>48 seconds, Arabic</span></a>
+    <a href="#posts"><b>The content</b><span>Six posts, three weeks</span></a>
+    <a href="#ask"><b>The ask</b><span>Four things I'd need</span></a>
+  </div>
 </header>
 
-<section>
+<nav class="chapters" aria-label="Chapters">
+  <div class="inner">
+    <a href="#diagnosis">Argument</a>
+    <a href="#play">Playables</a>
+    <a href="#numbers">Numbers</a>
+    <a href="#engine">Engine</a>
+    <a href="#segments">Segments</a>
+    <a href="#film">Film</a>
+    <a href="#calendar">Calendar</a>
+    <a href="#posts">Posts</a>
+    <a href="#ninety">90 days</a>
+    <a href="#ask">The ask</a>
+  </div>
+</nav>
+
+<section id="diagnosis">
   <div class="n">01 · THE DIAGNOSIS</div>
   <h2>Nobody in the room owns the format.</h2>
   <p>In the GCC, playables are bought almost entirely out of gaming user-acquisition budgets. That is a solved sale. The non-gaming sale is not, and the reason is structural rather than creative.</p>
@@ -167,7 +230,7 @@ footer b{color:var(--head);font-family:var(--display)}
   <p style="margin-top:20px">So the format does not lose the argument. It never gets into one. Every conversation ends with genuine interest and no budget line, and that is the thing a GCC hire has to fix first.</p>
 </section>
 
-<section>
+<section id="fix">
   <div class="n">02 · THE FIX</div>
   <h2>Stop selling playable ads.</h2>
   <p>Sell two different things to two different buyers, and never put both in the same deck.</p>
@@ -192,7 +255,7 @@ footer b{color:var(--head);font-family:var(--display)}
   <p style="margin-top:20px">The second one is the opportunity. It is where the budgets actually are, it is the harder sale, and as far as I can tell nobody in the region is making it.</p>
 </section>
 
-<section>
+<section id="play">
   <div class="n">03 · PROOF, NOT SLIDES</div>
   <h2>Five playables. Four sectors. Play them here.</h2>
   <p>Each one is a different mechanic, to show the format carries across verticals rather than suiting one. Each is a single HTML file under 17&nbsp;KB with no external assets, and each carries an Arabic–English toggle, which in this region is a selling point on its own.</p>
@@ -215,7 +278,7 @@ footer b{color:var(--head);font-family:var(--display)}
   <p style="margin-top:24px">One of these takes about a day. That is the whole outreach engine in section 05: instead of asking a brand for a meeting, you send them their own idea, already playable.</p>
 </section>
 
-<section>
+<section id="numbers">
   <div class="n">04 · THE NUMBER NOBODY CAN AGREE ON</div>
   <h2>A playable costs more to build and less per result.</h2>
   <p>Every published benchmark for this format comes from a company that sells the format, and the claims run from <strong>+32%</strong> conversion lift to <strong>+319%</strong>. Quoting any single figure to a media buyer starts an argument instead of a meeting.</p>
@@ -227,7 +290,7 @@ footer b{color:var(--head);font-family:var(--display)}
   </a>
 </section>
 
-<section>
+<section id="engine">
   <div class="n">05 · THE ENGINE</div>
   <h2>Thirty accounts, thirty playables.</h2>
   <p>The outreach motion is the thing that makes this different from any other agency approach, and it is only possible because the build is cheap and fast.</p>
@@ -241,7 +304,7 @@ footer b{color:var(--head);font-family:var(--display)}
   <p style="margin-top:20px">I already hold direct contacts at four named accounts from the case study — in delivery, telco, e-commerce and banking. Those are the first four conversations, and they do not need an introduction.</p>
 </section>
 
-<section>
+<section id="segments">
   <div class="n">06 · WHERE THE DEMAND IS</div>
   <h2>Segments, and why each one.</h2>
   <div class="seg">
@@ -253,7 +316,7 @@ footer b{color:var(--head);font-family:var(--display)}
   </div>
 </section>
 
-<section>
+<section id="channels">
   <div class="n">07 · CHANNELS</div>
   <h2>Who to go through.</h2>
   <div class="two">
@@ -263,7 +326,7 @@ footer b{color:var(--head);font-family:var(--display)}
   </div>
   <p style="margin-top:20px">And the one nobody outside would think of: <strong>Tamatem's existing Saudi network</strong>. The group already has relationships in this market that the non-gaming side has never used.</p>
 
-  <div class="film">
+  <div class="film" id="film" style="scroll-margin-top:84px">
     <div class="filmhead">
       <h3>Content, and what it actually looks like</h3>
       <p>Arabic case studies, a short GCC results report, and consistent LinkedIn posting — so that the person writing about this format in the region is us, and the inbound arrives already sold. Rather than describe that, here is the first piece of it.</p>
@@ -276,7 +339,7 @@ footer b{color:var(--head);font-family:var(--display)}
   </div>
 </section>
 
-<section>
+<section id="calendar">
   <div class="n">08 · THE CALENDAR IS THE PITCH</div>
   <h2>Seasons are planned eight to ten weeks ahead.</h2>
   <p>This region's spend concentrates into a handful of moments, and each has a date by which the plan is already locked. Selling into a season after that date is impossible, and before it is easy — which makes the calendar, not the product, the thing that sets the sales rhythm.</p>
@@ -290,8 +353,119 @@ footer b{color:var(--head);font-family:var(--display)}
   <p style="margin-top:20px">Each season gets a ready-made campaign concept built in advance, so the pitch is a working thing rather than a proposal to build one.</p>
 </section>
 
-<section>
-  <div class="n">09 · NINETY DAYS</div>
+<section id="posts">
+  <div class="n">09 · THE CONTENT ENGINE</div>
+  <h2>Six posts, three weeks, one destination.</h2>
+  <p>Content is the cheapest channel in this plan and the slowest to pay off, so it starts immediately and runs regardless of everything else. The aim is narrow: to be the person in this region who writes about this format, so a buyer knows the name before the first email arrives.</p>
+  <p>Every post ends at the same link. None of them opens by selling.</p>
+
+  <div class="posts">
+
+    <div class="post">
+      <div class="top">
+        <div class="idx">01</div>
+        <div>
+          <div class="hook" dir="rtl">دفعت ثمن مليون ظهور إعلاني الربع الماضي.<br>كم واحد منهم شاف إعلانك فعلاً؟</div>
+          <div class="meta"><span class="fmt">video</span><span class="role">Makes them feel the loss before anything is offered.</span></div>
+        </div>
+      </div>
+      <details><summary>Read the post</summary><div class="draft">دفعت ثمن مليون ظهور إعلاني الربع الماضي.
+
+كم واحد منهم شاف إعلانك فعلاً؟
+
+المشكلة مش في الكرييتيف. المشكلة إنك بطّلت تملك الظهور عند الثانية التالتة — وده مش عيب في الفيديو، ده طبيعة الفورمات نفسه.
+
+الإعلان التفاعلي بيحل ده بطريقة واحدة بسيطة: الناس بتلعبه بدل ما تتخطاه. خمستاشر ثانية تفاعل حقيقي بدل تلات ثوان تجاهل.
+
+بس خليني أكون صريح معاك: بيتكلف أكتر في الإنتاج. فالسؤال مش "أنهي أحسن" — السؤال "عند أي ميزانية يبقى أرخص في النتيجة؟"
+
+عملت حاسبة تجاوب على ده. تحط ميزانيتك وسوقك وتكلفة إنتاجك، وهي تقولك نقطة التعادل. كل الأرقام الافتراضية مصادرها مكتوبة، وكلها تقدر تغيّرها.
+
+الحاسبة في أول كومنت 👇<span class="cm">First comment: the calculator link, pinned — never in the body.</span></div></details>
+    </div>
+
+    <div class="post">
+      <div class="top">
+        <div class="idx">02</div>
+        <div>
+          <div class="hook" dir="rtl">كل رقم منشور عن الإعلانات التفاعلية جاي من شركة بتبيع الإعلانات التفاعلية.<br>وأنا واحد منهم.</div>
+          <div class="meta"><span class="fmt">text only</span><span class="role">Credibility. It sells nothing, and that is the mechanism.</span></div>
+        </div>
+      </div>
+      <details><summary>Read the post</summary><div class="draft">كل رقم منشور عن الإعلانات التفاعلية جاي من شركة بتبيع الإعلانات التفاعلية.
+
+وأنا واحد منهم.
+
+لما قررت أعرف الفورمات ده بيحقق إيه فعلاً، لقيت الأرقام بتبدأ من +32% في معدل التحويل وتوصل لـ +319%. نفس الفورمات، نفس السنة، وفرق عشرة أضعاف بين أقل رقم وأكبر رقم.
+
+والمشكلة مش إن فيه رقم غلط فيهم. المشكلة إن أي media buyer شاطر في الرياض أو دبي اتعرض عليه نفس الكلام قبل كده — ولما تيجي تقوله رقم، هو مش بيسمع الرقم. هو بيستنى يعرف إنت جاي من أنهي شركة.
+
+فبطّلت أقول أرقام.
+
+بنيت حاسبة بدالها. تحط فيها ميزانيتك إنت، والـ CPM بتاع سوقك إنت، وتكلفة إنتاجك إنت — وهي تقولك عند أي مستوى إنفاق يبقى الإعلان التفاعلي أرخص في النتيجة من الفيديو.
+
+وعشان نكون صريحين من أول سطر: الإعلان التفاعلي بيتكلف أكتر في الإنتاج. دي مش نقطة ضعف بحاول أخبّيها، دي نص المعادلة.
+
+كل رقم افتراضي في الحاسبة مكتوب جنبه مصدره. وكلهم تقدر تغيّرهم، بما فيهم رقم الـ lift اللي الكل بيختلف عليه. لو شايف إن +32% متفائل أوي، نزّله لـ +10% وشوف نقطة التعادل بتتحرك فين.
+
+اللينك في أول كومنت 👇<span class="cm">Expect "what is your own data?" — the answer is that there is none yet, and that this is exactly why no numbers are quoted.</span></div></details>
+    </div>
+
+    <div class="post">
+      <div class="top">
+        <div class="idx">03</div>
+        <div>
+          <div class="hook" dir="rtl">عملت إعلان تفاعلي لـ Tabby في يوم واحد. مش موك-أب — إعلان شغال.<br>جربه وقوللي: تخطيته بعد كام ثانية؟</div>
+          <div class="meta"><span class="fmt">raw screen recording</span><span class="role">The product demonstrates itself. No edit, no music — a thumb and a game.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="post">
+      <div class="top">
+        <div class="idx">04</div>
+        <div>
+          <div class="hook" dir="rtl">لو بتخطط لرمضان ٢٠٢٧ في يناير، فأنت اتأخرت.</div>
+          <div class="meta"><span class="fmt">single image</span><span class="role">Useful whether or not they care about the format. Generates DMs, not likes.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="post">
+      <div class="top">
+        <div class="idx">05</div>
+        <div>
+          <div class="hook" dir="rtl">الإعلان التفاعلي مش بيخسر النقاش في الخليج.<br>هو عمره ما دخل النقاش من الأساس.</div>
+          <div class="meta"><span class="fmt">long text · no link</span><span class="role">The credibility post — the one a head of growth forwards to a colleague.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="post">
+      <div class="top">
+        <div class="idx">06</div>
+        <div>
+          <div class="hook" dir="rtl">الإعلان التفاعلي مش دايماً الحل الصح. خليني أقولك إمتى ما ينفعش.</div>
+          <div class="meta"><span class="fmt">short text</span><span class="role">Closes by telling them not to buy. Makes the five before it credible in hindsight.</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="rules">
+    <ul>
+      <li><b>Two a week</b> — Sunday and Wednesday, 08:00–10:00 Gulf time.</li>
+      <li><b>Never the same format twice in a row.</b> Video, then text, then interactive, then text.</li>
+      <li><b>The link goes in the pinned first comment</b>, never in the body — except post 05, which carries no link at all, because a link would stop it travelling.</li>
+      <li><b>Reply to every comment inside the first hour.</b> That is what moves reach, not the post itself.</li>
+      <li><b>Post 04 is time-bound.</b> It runs while the Ramadan window is genuinely open. After December it is a worse post, so it gets dropped rather than posted late.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="ninety">
+  <div class="n">10 · NINETY DAYS</div>
   <h2>What I would actually do.</h2>
   <div class="days">
     <div class="day"><div class="d">Month 1 · prove</div><ul>
@@ -327,8 +501,8 @@ footer b{color:var(--head);font-family:var(--display)}
   </div>
 </section>
 
-<section>
-  <div class="n">10 · WHAT I WOULD NEED</div>
+<section id="ask">
+  <div class="n">11 · WHAT I WOULD NEED</div>
   <h2>Four things, none of them money.</h2>
   <div class="ask">
     <ol>
@@ -362,6 +536,27 @@ footer b{color:var(--head);font-family:var(--display)}
     nm.textContent=b.dataset.name;
     why.textContent=b.dataset.why;
   });
+
+  // chapter nav: mark whichever section is currently in view
+  var links={}, nav=document.querySelector('.chapters');
+  Array.prototype.forEach.call(document.querySelectorAll('.chapters a'),function(a){
+    links[a.getAttribute('href').slice(1)]=a;
+  });
+  var targets=Object.keys(links).map(function(id){return document.getElementById(id)}).filter(Boolean);
+  if(window.IntersectionObserver && targets.length){
+    var seen={};
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){ seen[en.target.id]=en.isIntersecting?en.intersectionRatio:0; });
+      var best=null,bv=0;
+      Object.keys(seen).forEach(function(id){ if(seen[id]>bv){bv=seen[id];best=id;} });
+      Object.keys(links).forEach(function(id){ links[id].classList.toggle('here',id===best); });
+      if(best&&links[best]&&nav){                 // keep the active chip in view on narrow screens
+        var a=links[best], r=a.getBoundingClientRect(), p=nav.getBoundingClientRect();
+        if(r.left<p.left||r.right>p.right) a.scrollIntoView({block:'nearest',inline:'center'});
+      }
+    },{rootMargin:'-72px 0px -55% 0px',threshold:[0,.25,.5,1]});
+    targets.forEach(function(t){io.observe(t)});
+  }
 })();
 </script>
 </body>
