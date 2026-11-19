@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Fill the Bag – Playable Ad Concept for talabat</title>
+<!-- Concept playable by Mahmoud Anwar for the Playable Factory sales case study.
+     Not an official talabat ad. Single file, no external assets, MRAID-aware CTA. -->
+<style>
+  :root{--orange:#FF5A00;--orange2:#FF7A2E;--ink:#1D1D24;--cream:#FFF6EE;--green:#1F9D55;--muted:#6B6B78}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none}
+  html,body{height:100%;background:#111;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);overflow:hidden}
+  #ad{position:relative;width:100vw;height:100vh;max-width:430px;max-height:932px;margin:0 auto;background:var(--cream);overflow:hidden}
+  header{position:absolute;top:0;left:0;right:0;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:20}
+  .brand{font-weight:800;font-size:22px;color:var(--orange);letter-spacing:-.5px}
+  .mini-cta{background:var(--orange);color:#fff;border:none;border-radius:20px;padding:8px 14px;font-weight:700;font-size:13px;cursor:pointer}
+  .screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:70px 22px 30px;text-align:center}
+  .screen.on{display:flex}
+  h1{font-size:34px;line-height:1.1;font-weight:800;margin-bottom:12px}
+  h2{font-size:24px;font-weight:800;margin-bottom:18px}
+  p.sub{font-size:16px;color:var(--muted);margin-bottom:26px}
+  .big{font-size:84px;margin-bottom:10px;animation:bob 1.6s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-10px)}}
+  .btn{background:var(--orange);color:#fff;border:none;border-radius:30px;padding:16px 34px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 6px 0 #C94600;animation:pulse 1.2s ease-in-out infinite}
+  @keyframes pulse{50%{transform:scale(1.06)}}
+  .hand{font-size:40px;margin-top:14px;animation:tap 1s ease-in-out infinite}
+  @keyframes tap{50%{transform:translate(8px,8px) scale(.9)}}
+  .cards{display:flex;flex-direction:column;gap:12px;width:100%}
+  .card{display:flex;align-items:center;gap:14px;background:#fff;border:3px solid transparent;border-radius:18px;padding:14px 16px;font-size:18px;font-weight:700;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.07);text-align:left}
+  .card span.e{font-size:38px}
+  .card small{display:block;font-weight:500;font-size:13px;color:var(--muted)}
+  .card:active{border-color:var(--orange)}
+  /* game */
+  #game{padding:0;justify-content:flex-start}
+  #hud{position:absolute;top:56px;left:14px;right:14px;z-index:5}
+  #timebar{height:10px;background:#F1DCCB;border-radius:6px;overflow:hidden}
+  #timefill{height:100%;width:100%;background:var(--orange);transition:width .1s linear}
+  #stats{display:flex;justify-content:space-between;margin-top:8px;font-weight:800;font-size:16px}
+  #saved{color:var(--green)}
+  #field{position:absolute;inset:0}
+  .item{position:absolute;font-size:44px;line-height:1;will-change:transform;pointer-events:none}
+  .item .tag{position:absolute;top:-14px;right:-18px;background:var(--green);color:#fff;font-size:11px;font-weight:800;border-radius:8px;padding:2px 5px}
+  .item.pro .tag{background:#6C2BD9}
+  #bag{position:absolute;bottom:40px;width:110px;height:96px;margin-left:-55px;background:var(--orange);border-radius:10px 10px 22px 22px;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;font-weight:800;font-size:15px;box-shadow:0 6px 0 #C94600;will-change:left}
+  #bag:before{content:"";position:absolute;top:-22px;left:30px;width:50px;height:30px;border:6px solid var(--orange);border-bottom:none;border-radius:30px 30px 0 0}
+  #bag b{font-size:26px}
+  #hint{position:absolute;bottom:150px;left:0;right:0;font-weight:700;color:var(--muted);font-size:15px;transition:opacity .4s}
+  .pop{position:absolute;font-weight:800;color:var(--green);font-size:18px;pointer-events:none;animation:rise .7s ease-out forwards}
+  @keyframes rise{to{transform:translateY(-50px);opacity:0}}
+  /* delivery */
+  #road{position:relative;width:100%;height:120px;margin:20px 0}
+  #road:before{content:"";position:absolute;left:0;right:0;top:78px;border-top:4px dashed #E5C9B3}
+  #rider{position:absolute;left:0;top:20px;font-size:56px;transform:scaleX(-1)}
+  #home{position:absolute;right:0;top:12px;font-size:60px}
+  #eta{font-size:20px;font-weight:800;color:var(--orange)}
+  /* end */
+  .bagsum{font-size:40px;letter-spacing:4px;margin:6px 0 10px;min-height:48px}
+  .savebox{background:#fff;border-radius:18px;padding:16px 18px;width:100%;margin-bottom:18px;box-shadow:0 3px 10px rgba(0,0,0,.07)}
+  .savebox .n{font-size:30px;font-weight:800;color:var(--green)}
+  .offer{background:var(--orange);color:#fff;border-radius:16px;padding:12px;font-weight:800;font-size:18px;width:100%;margin-bottom:18px}
+  .offer small{display:block;font-weight:600;font-size:12px;opacity:.9}
+  .ghost{background:none;border:none;color:var(--muted);font-weight:700;font-size:15px;margin-top:14px;cursor:pointer;text-decoration:underline}
+  .foot{position:absolute;bottom:8px;left:0;right:0;font-size:10px;color:#9A9AA5;text-align:center}
+</style>
+</head>
+<body>
+<div id="ad">
+  <header><div class="brand">talabat</div><button class="mini-cta" onclick="cta('header')">Order now</button></header>
+
+  <section class="screen on" id="s-intro">
+    <div class="big">🛵</div>
+    <h1>Hungry?<br>Fill your bag in 10 seconds!</h1>
+    <p class="sub">Catch your favourites, collect the deals.</p>
+    <button class="btn" onclick="go('s-pick')">TAP TO PLAY</button>
+    <div class="hand">👆</div>
+  </section>
+
+  <section class="screen" id="s-pick">
+    <h2>What are you craving?</h2>
+    <div class="cards">
+      <div class="card" onclick="pick('burger')"><span class="e">🍔</span><div>Burgers &amp; fast food<small>Your go-to comfort food</small></div></div>
+      <div class="card" onclick="pick('healthy')"><span class="e">🥗</span><div>Healthy bites<small>Salads, bowls, sushi</small></div></div>
+      <div class="card" onclick="pick('mart')"><span class="e">🛒</span><div>Groceries<small>From talabat mart, in minutes</small></div></div>
+    </div>
+  </section>
+
+  <section class="screen" id="game">
+    <div id="hud"><div id="timebar"><div id="timefill"></div></div>
+      <div id="stats"><span id="count">🛍️ 0 items</span><span id="saved">Saved AED 0</span></div></div>
+    <div id="field"></div>
+    <div id="hint">👈 Drag the bag to catch 👉</div>
+    <div id="bag"><b>0</b>talabat</div>
+  </section>
+
+  <section class="screen" id="s-deliver">
+    <h2>Your rider is on the way!</h2>
+    <div id="road"><div id="rider">🛵</div><div id="home">🏠</div></div>
+    <div id="eta">Arriving in 20 min</div>
+  </section>
+
+  <section class="screen" id="s-end">
+    <h2>Your bag is ready! 🎉</h2>
+    <div class="bagsum" id="bagsum"></div>
+    <div class="savebox">You collected<div class="n" id="endsaved">AED 0</div>in deals</div>
+    <div class="offer">Your first order: 50% OFF<small>Example offer, for concept only</small></div>
+    <button class="btn" onclick="cta('endcard')">ORDER NOW</button>
+    <button class="ghost" onclick="restart()">Play again</button>
+  </section>
+
+  <div class="foot">Concept playable for a Playable Factory sales case study · not an official talabat ad</div>
+</div>
+
+<script>
+const STORE_URL='https://www.talabat.com/';
+const POOLS={burger:['🍔','🍟','🥤','🌯','🍕','🍗'],healthy:['🥗','🥑','🍣','🍓','🥤','🍲'],mart:['🥛','🍞','🍎','🥚','🧃','🍌']};
+const DURATION=10000;
+let pool=POOLS.burger, items=[], caught=[], saved=0, running=false, t0=0, lastSpawn=0, raf=0;
+const $=id=>document.getElementById(id);
+const ad=$('ad'), field=$('field'), bag=$('bag');
+let bagX=0;
+
+function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');}
+function cta(where){ // MRAID-aware: real ad networks open the store/deep link via mraid.open
+  try{ if(window.mraid&&mraid.open){mraid.open(STORE_URL);return;} }catch(e){}
+  window.open(STORE_URL,'_blank');
+}
+function pick(k){pool=POOLS[k];go('game');start();}
+
+function start(){
+  items.forEach(i=>i.el.remove()); items=[]; caught=[]; saved=0;
+  bagX=ad.clientWidth/2; bag.style.left=bagX+'px';
+  $('hint').style.opacity=1; updateHud();
+  running=true; t0=performance.now(); lastSpawn=0;
+  raf=requestAnimationFrame(loop);
+}
+function spawn(){
+  const w=ad.clientWidth, pro=Math.random()<0.12;
+  const el=document.createElement('div'); el.className='item'+(pro?' pro':'');
+  const val=pro?8:2+Math.floor(Math.random()*5);
+  el.innerHTML=(pro?'⭐':pool[Math.floor(Math.random()*pool.length)])+'<span class="tag">'+(pro?'PRO':'-'+val)+'</span>';
+  field.appendChild(el);
+  items.push({el,x:30+Math.random()*(w-80),y:110,v:2.2+Math.random()*1.6,val,emoji:pro?'⭐':el.firstChild.textContent});
+}
+function loop(now){
+  if(!running)return;
+  const t=now-t0, left=Math.max(0,DURATION-t);
+  $('timefill').style.width=(left/DURATION*100)+'%';
+  if(now-lastSpawn>520){spawn();lastSpawn=now;}
+  const h=ad.clientHeight, bagTop=h-40-96;
+  for(let i=items.length-1;i>=0;i--){
+    const it=items[i]; it.y+=it.v*(1+t/DURATION*0.6);
+    it.el.style.transform='translate('+it.x+'px,'+it.y+'px)';
+    if(it.y>bagTop-30&&it.y<bagTop+40&&Math.abs(it.x+22-bagX)<70){
+      caught.push(it.emoji); saved+=it.val; popText('+AED '+it.val,it.x,it.y);
+      it.el.remove(); items.splice(i,1); updateHud(); bag.animate([{transform:'scale(1.12)'},{transform:'scale(1)'}],{duration:180});
+    } else if(it.y>h){it.el.remove();items.splice(i,1);}
+  }
+  if(left<=0){running=false;cancelAnimationFrame(raf);setTimeout(deliver,300);return;}
+  raf=requestAnimationFrame(loop);
+}
+function popText(txt,x,y){const p=document.createElement('div');p.className='pop';p.textContent=txt;p.style.left=x+'px';p.style.top=y+'px';field.appendChild(p);setTimeout(()=>p.remove(),700);}
+function updateHud(){$('count').textContent='🛍️ '+caught.length+' items';$('saved').textContent='Saved AED '+saved;bag.querySelector('b').textContent=caught.length;}
+function moveBag(clientX){
+  const r=ad.getBoundingClientRect(); bagX=Math.min(r.width-55,Math.max(55,clientX-r.left));
+  bag.style.left=bagX+'px'; $('hint').style.opacity=0;
+}
+ad.addEventListener('pointermove',e=>{if(running)moveBag(e.clientX);});
+ad.addEventListener('pointerdown',e=>{if(running)moveBag(e.clientX);});
+ad.addEventListener('touchmove',e=>{if(running){moveBag(e.touches[0].clientX);e.preventDefault();}},{passive:false});
+
+function deliver(){
+  go('s-deliver');
+  const road=$('road'), rider=$('rider'), W=road.clientWidth-70; let m=20, start=performance.now();
+  (function anim(now){
+    const p=Math.min(1,(now-start)/1800);
+    rider.style.left=(p*W)+'px'; const mins=Math.max(0,Math.round(20*(1-p)));
+    $('eta').textContent=mins>0?'Arriving in '+mins+' min':'Delivered! 🎉';
+    if(p<1)requestAnimationFrame(anim); else setTimeout(endcard,500);
+  })(start);
+}
+function endcard(){
+  $('bagsum').textContent=caught.slice(0,8).join('')||'🛍️';
+  $('endsaved').textContent='AED '+saved;
+  go('s-end');
+}
+function restart(){go('s-pick');}
+</script>
+</body>
+</html>
