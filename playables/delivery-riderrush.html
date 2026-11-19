@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Rider Rush – Playable Ad Concept for talabat</title>
+<!-- Concept playable by Mahmoud Anwar for the Playable Factory sales case study.
+     Not an official talabat ad. Single file, no external assets, MRAID-aware CTA. -->
+<style>
+  :root{--orange:#FF5A00;--ink:#1D1D24;--cream:#FFF6EE;--green:#1F9D55;--muted:#6B6B78;--road:#3B3B45}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none}
+  html,body{height:100%;background:#111;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);overflow:hidden}
+  #ad{position:relative;width:100vw;height:100vh;max-width:430px;max-height:932px;margin:0 auto;background:var(--cream);overflow:hidden;touch-action:none}
+  header{position:absolute;top:0;left:0;right:0;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:30}
+  .brand{font-weight:800;font-size:22px;color:var(--orange);letter-spacing:-.5px}
+  .on-road .brand{color:#fff}
+  .mini-cta{background:var(--orange);color:#fff;border:none;border-radius:20px;padding:8px 14px;font-weight:700;font-size:13px;cursor:pointer}
+  .screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:70px 22px 30px;text-align:center}
+  .screen.on{display:flex}
+  h1{font-size:34px;line-height:1.1;font-weight:800;margin-bottom:12px}
+  h2{font-size:26px;font-weight:800;margin-bottom:14px}
+  p.sub{font-size:16px;color:var(--muted);margin-bottom:24px;line-height:1.4}
+  .big{font-size:84px;margin-bottom:10px;animation:bob 1.6s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-10px)}}
+  .btn{background:var(--orange);color:#fff;border:none;border-radius:30px;padding:16px 34px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 6px 0 #C94600;animation:pulse 1.2s ease-in-out infinite}
+  @keyframes pulse{50%{transform:scale(1.06)}}
+  .legend{display:flex;gap:18px;justify-content:center;margin-bottom:24px;font-size:14px;font-weight:700;color:var(--muted)}
+  .legend span{display:flex;flex-direction:column;align-items:center;gap:4px}
+  .legend b{font-size:34px}
+  /* game */
+  #game{padding:0;background:var(--road)}
+  #road{position:absolute;inset:0;background:
+     linear-gradient(90deg,#2C7A3F 0,#2C7A3F 8%,#555 8%,#555 9%,transparent 9%,transparent 91%,#555 91%,#555 92%,#2C7A3F 92%),
+     repeating-linear-gradient(180deg,transparent 0 40px,#fff 40px 80px) 36% 0/4px 100% no-repeat,
+     repeating-linear-gradient(180deg,transparent 0 40px,#fff 40px 80px) 64% 0/4px 100% no-repeat,var(--road)}
+  #hud{position:absolute;top:56px;left:14px;right:14px;z-index:20}
+  #timebar{height:10px;background:rgba(255,255,255,.25);border-radius:6px;overflow:hidden}
+  #timefill{height:100%;width:100%;background:var(--orange)}
+  #stats{display:flex;justify-content:space-between;margin-top:8px;font-weight:800;font-size:16px;color:#fff}
+  #dots{letter-spacing:2px}
+  .obj{position:absolute;top:0;left:0;font-size:46px;line-height:1;will-change:transform;pointer-events:none;text-align:center;width:60px;margin-left:-30px}
+  #rider{position:absolute;bottom:90px;width:70px;margin-left:-35px;font-size:60px;text-align:center;transition:left .12s ease-out;z-index:10}
+  #rider span{display:inline-block;transform:rotate(-90deg)}
+  #rider.hit{animation:shake .35s}
+  @keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+  #hint{position:absolute;bottom:20px;left:0;right:0;font-weight:700;color:#fff;font-size:15px;transition:opacity .4s;z-index:20}
+  .pop{position:absolute;font-weight:800;font-size:18px;pointer-events:none;animation:rise .7s ease-out forwards;z-index:25;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.5)}
+  .pop.good{color:#7CF2A8}.pop.bad{color:#FF9B9B}
+  @keyframes rise{to{transform:translateY(-50px);opacity:0}}
+  /* end */
+  .resultbox{background:#fff;border-radius:18px;padding:16px 18px;width:100%;margin-bottom:16px;box-shadow:0 3px 10px rgba(0,0,0,.07)}
+  .resultbox .n{font-size:34px;font-weight:800;color:var(--green)}
+  .offer{background:var(--orange);color:#fff;border-radius:16px;padding:12px;font-weight:800;font-size:18px;width:100%;margin-bottom:18px}
+  .offer small{display:block;font-weight:600;font-size:12px;opacity:.9}
+  .ghost{background:none;border:none;color:var(--muted);font-weight:700;font-size:15px;margin-top:14px;cursor:pointer;text-decoration:underline}
+  .foot{position:absolute;bottom:8px;left:0;right:0;font-size:10px;color:#9A9AA5;text-align:center;z-index:30}
+  .on-road .foot{display:none}
+</style>
+</head>
+<body>
+<div id="ad">
+  <header><div class="brand">talabat</div><button class="mini-cta" onclick="cta()">Order now</button></header>
+
+  <section class="screen on" id="s-intro">
+    <div class="big">🛵</div>
+    <h1>Be the rider!<br>Deliver 5 orders in 15 seconds</h1>
+    <p class="sub">Tap left or right to switch lanes.</p>
+    <div class="legend"><span><b>🛍️</b>Pick up</span><span><b>⏱️</b>+2 sec</span><span><b>🚧</b>Avoid</span></div>
+    <button class="btn" onclick="start()">TAP TO RIDE</button>
+  </section>
+
+  <section class="screen" id="game">
+    <div id="road"></div>
+    <div id="hud"><div id="timebar"><div id="timefill"></div></div>
+      <div id="stats"><span id="dots">⚪⚪⚪⚪⚪</span><span id="secs">15s</span></div></div>
+    <div id="field"></div>
+    <div id="rider"><span>🛵</span></div>
+    <div id="hint">👈 Tap left · Tap right 👉</div>
+  </section>
+
+  <section class="screen" id="s-end">
+    <div class="big" id="endicon">🎉</div>
+    <h2 id="endtitle">All orders delivered!</h2>
+    <div class="resultbox"><span id="endlabel">You delivered</span><div class="n" id="endcount">5 / 5</div><span id="endsub">in record time</span></div>
+    <div class="offer">Hungry now? Your first order: 50% OFF<small>Example offer, for concept only</small></div>
+    <button class="btn" onclick="cta()">ORDER NOW</button>
+    <button class="ghost" onclick="start()">Ride again</button>
+  </section>
+
+  <div class="foot">Concept playable for a Playable Factory sales case study · not an official talabat ad</div>
+</div>
+
+<script>
+const STORE_URL='https://www.talabat.com/';
+const LANES=[0.22,0.5,0.78], GOAL=5, DURATION=15000;
+const $=id=>document.getElementById(id);
+const ad=$('ad'), field=$('field'), rider=$('rider');
+let lane=1, objs=[], delivered=0, timeLeft=DURATION, running=false, last=0, lastSpawn=0, speed=0, roadY=0, raf=0;
+
+function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');ad.classList.toggle('on-road',id==='game');}
+function cta(){ try{ if(window.mraid&&mraid.open){mraid.open(STORE_URL);return;} }catch(e){} window.open(STORE_URL,'_blank'); }
+
+function start(){
+  objs.forEach(o=>o.el.remove()); objs=[]; delivered=0; timeLeft=DURATION; lane=1; speed=0.32;
+  go('game'); placeRider(); $('hint').style.opacity=1; hud();
+  running=true; last=performance.now(); lastSpawn=last; raf=requestAnimationFrame(loop);
+}
+function placeRider(){ rider.style.left=(LANES[lane]*ad.clientWidth)+'px'; }
+function steer(dir){ if(!running)return; lane=Math.max(0,Math.min(2,lane+dir)); placeRider(); $('hint').style.opacity=0; }
+ad.addEventListener('pointerdown',e=>{ if(!running)return; const r=ad.getBoundingClientRect(); steer(e.clientX-r.left<r.width/2?-1:1); });
+document.addEventListener('keydown',e=>{ if(e.key==='ArrowLeft')steer(-1); if(e.key==='ArrowRight')steer(1); });
+
+function spawn(){
+  // one item per row; guarantee a free lane
+  const r=Math.random(), type=r<0.42?'bag':r<0.55?'clock':'block';
+  const ln=Math.floor(Math.random()*3);
+  const em=type==='bag'?'🛍️':type==='clock'?'⏱️':(['🚧','🚗','🕳️','🚕'][Math.floor(Math.random()*4)]);
+  const el=document.createElement('div'); el.className='obj'; el.textContent=em; field.appendChild(el);
+  objs.push({el,type,lane:ln,y:96});
+}
+function pop(txt,cls,x,y){const p=document.createElement('div');p.className='pop '+cls;p.textContent=txt;p.style.left=(x-30)+'px';p.style.top=y+'px';field.appendChild(p);setTimeout(()=>p.remove(),700);}
+function hud(){
+  $('dots').textContent='🛍️'.repeat(delivered)+'⚪'.repeat(GOAL-delivered);
+  $('secs').textContent=Math.ceil(timeLeft/1000)+'s';
+  $('timefill').style.width=(Math.max(0,timeLeft)/DURATION*100)+'%';
+}
+function loop(now){
+  if(!running)return;
+  const dt=Math.min(50,now-last); last=now; timeLeft-=dt; speed+=dt*0.000012;
+  roadY=(roadY+speed*dt)%80; $('road').style.backgroundPosition='0 0,36% '+roadY+'px,64% '+roadY+'px,0 0';
+  if(now-lastSpawn>Math.max(420,700-speed*400)){spawn();lastSpawn=now;}
+  const W=ad.clientWidth, H=ad.clientHeight, riderY=H-90-60;
+  for(let i=objs.length-1;i>=0;i--){
+    const o=objs[i]; o.y+=speed*dt;
+    o.el.style.transform='translate('+(LANES[o.lane]*W)+'px,'+o.y+'px)';
+    if(o.lane===lane && o.y>riderY-40 && o.y<riderY+40){
+      const x=LANES[o.lane]*W;
+      if(o.type==='bag'){delivered++;pop('+1 order','good',x,o.y);}
+      else if(o.type==='clock'){timeLeft=Math.min(DURATION,timeLeft+2000);pop('+2s','good',x,o.y);}
+      else {timeLeft-=2000;pop('−2s','bad',x,o.y);rider.classList.remove('hit');void rider.offsetWidth;rider.classList.add('hit');}
+      o.el.remove(); objs.splice(i,1); hud(); continue;
+    }
+    if(o.y>H){o.el.remove();objs.splice(i,1);}
+  }
+  hud();
+  if(delivered>=GOAL||timeLeft<=0){running=false;cancelAnimationFrame(raf);setTimeout(end,350);return;}
+  raf=requestAnimationFrame(loop);
+}
+function end(){
+  const win=delivered>=GOAL;
+  $('endicon').textContent=win?'🎉':'⏱️';
+  $('endtitle').textContent=win?'All orders delivered!':'So close!';
+  $('endlabel').textContent='You delivered';
+  $('endcount').textContent=Math.min(delivered,GOAL)+' / '+GOAL;
+  $('endsub').textContent=win?'with '+Math.ceil(timeLeft/1000)+' seconds to spare':'Our riders never miss. Let them bring yours.';
+  go('s-end');
+}
+</script>
+</body>
+</html>
