@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Split It – Playable Ad Concept for Tabby</title>
+<!-- Spec playable by Mahmoud Anwar. Sector: fintech / BNPL. Mechanic: tap-to-split (reaction).
+     Concept only — not an official Tabby ad. Single file, no external assets, MRAID-aware CTA. -->
+<style>
+  :root{--mint:#2FD6A8;--mint2:#15B88C;--ink:#10243A;--paper:#F3FBF8;--warn:#FF6B5A;--muted:#6E8296}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none}
+  html,body{height:100%;background:#0B1622;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);overflow:hidden}
+  #ad{position:relative;width:100vw;height:100vh;max-width:430px;max-height:932px;margin:0 auto;background:var(--paper);overflow:hidden}
+  header{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:20}
+  .brand{font-weight:800;font-size:23px;color:var(--ink);letter-spacing:-.6px}
+  .brand i{color:var(--mint2);font-style:normal}
+  .right{display:flex;align-items:center;gap:8px}
+  .lang{background:#fff;border:1.5px solid #D6E7E0;color:var(--ink);border-radius:16px;padding:6px 11px;font-weight:800;font-size:12px;cursor:pointer}
+  .mini-cta{background:var(--ink);color:#fff;border:none;border-radius:20px;padding:8px 14px;font-weight:700;font-size:13px;cursor:pointer}
+  .screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:72px 22px 28px;text-align:center}
+  .screen.on{display:flex}
+  h1{font-size:33px;line-height:1.12;font-weight:800;margin-bottom:12px}
+  h2{font-size:25px;font-weight:800;margin-bottom:14px}
+  p.sub{font-size:16px;color:var(--muted);margin-bottom:26px;line-height:1.45}
+  .big{font-size:78px;margin-bottom:12px;animation:bob 1.7s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-11px)}}
+  .btn{background:var(--mint2);color:#fff;border:none;border-radius:30px;padding:16px 34px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 6px 0 #0E8A69;animation:pulse 1.25s ease-in-out infinite}
+  @keyframes pulse{50%{transform:scale(1.06)}}
+  .ghost{background:none;border:none;color:var(--muted);font-size:15px;font-weight:700;margin-top:14px;cursor:pointer;text-decoration:underline}
+  .hand{font-size:38px;margin-top:16px;animation:tap 1s ease-in-out infinite}
+  @keyframes tap{50%{transform:translateY(9px) scale(.88)}}
+  /* game */
+  #game{padding:0;justify-content:flex-start}
+  #hud{position:absolute;top:58px;left:14px;right:14px;z-index:6}
+  #timebar{height:10px;background:#DCEFE8;border-radius:6px;overflow:hidden}
+  #timefill{height:100%;width:100%;background:var(--mint2);transition:width .1s linear}
+  #stats{display:flex;justify-content:space-between;margin-top:9px;font-weight:800;font-size:15px}
+  #todaylbl{color:var(--mint2)}
+  #field{position:absolute;inset:0}
+  .price{position:absolute;background:#fff;border:2.5px solid var(--ink);border-radius:16px;padding:11px 15px;font-weight:800;font-size:21px;line-height:1;box-shadow:0 4px 0 rgba(16,36,58,.18);cursor:pointer;will-change:transform;white-space:nowrap}
+  .price small{display:block;font-size:10px;font-weight:700;color:var(--muted);margin-top:3px;letter-spacing:.06em}
+  .chunk{position:absolute;background:var(--mint);border:2px solid var(--mint2);color:var(--ink);border-radius:11px;padding:6px 9px;font-weight:800;font-size:13px;pointer-events:none;will-change:transform,opacity}
+  .miss{position:absolute;color:var(--warn);font-weight:800;font-size:16px;pointer-events:none;animation:rise .8s ease-out forwards}
+  @keyframes rise{to{transform:translateY(-46px);opacity:0}}
+  #ground{position:absolute;left:0;right:0;bottom:0;height:92px;background:linear-gradient(180deg,rgba(243,251,248,0),#E3F2EC 55%);display:flex;align-items:flex-end;justify-content:center;padding-bottom:16px;font-weight:800;color:var(--muted);font-size:14px}
+  #hint{position:absolute;bottom:112px;left:0;right:0;font-weight:800;color:var(--ink);font-size:16px;transition:opacity .4s}
+  /* end */
+  .rows{background:#fff;border-radius:20px;padding:18px;width:100%;margin-bottom:16px;box-shadow:0 4px 14px rgba(16,36,58,.08)}
+  .r{display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:700;padding:7px 0;color:var(--muted)}
+  .r.tot{border-top:2px dashed #D6E7E0;margin-top:6px;padding-top:12px;color:var(--ink);font-size:17px}
+  .r.tot b{font-size:27px;color:var(--mint2)}
+  .four{display:flex;gap:7px;width:100%;margin-bottom:18px}
+  .four div{flex:1;background:#fff;border:2px solid #D6E7E0;border-radius:12px;padding:10px 4px;font-size:12px;font-weight:800;color:var(--muted)}
+  .four div:first-child{border-color:var(--mint2);background:var(--mint);color:var(--ink)}
+  .four div b{display:block;font-size:14px;margin-top:3px}
+  .foot{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:10px;color:#9BB0C2;padding:0 16px;line-height:1.35;z-index:30}
+  [dir="rtl"] .price small{letter-spacing:0}
+</style>
+</head>
+<body>
+<div id="ad">
+  <header>
+    <div class="brand">tabby<i>.</i></div>
+    <div class="right">
+      <button class="lang" onclick="setLang()" id="langb">عربي</button>
+      <button class="mini-cta" onclick="cta('header')" id="hcta">Get Tabby</button>
+    </div>
+  </header>
+
+  <section class="screen on" id="s-intro">
+    <div class="big">🛍️</div>
+    <h1 id="i-h1">Cart too heavy?</h1>
+    <p class="sub" id="i-sub">Tap every price before it lands.<br>Watch it split into 4.</p>
+    <button class="btn" onclick="start()" id="i-btn">TAP TO PLAY</button>
+    <div class="hand">👆</div>
+  </section>
+
+  <section class="screen" id="game">
+    <div id="hud">
+      <div id="timebar"><div id="timefill"></div></div>
+      <div id="stats"><span id="splitlbl">✂️ 0 split</span><span id="todaylbl">Today SAR 0</span></div>
+    </div>
+    <div id="field"></div>
+    <div id="ground"><span id="groundlbl">paid in full 😬</span></div>
+    <div id="hint">👆 Tap the prices</div>
+  </section>
+
+  <section class="screen" id="s-end">
+    <h2 id="e-h2">Nice splitting! 🎉</h2>
+    <div class="rows">
+      <div class="r"><span id="e-l1">Cart total</span><span id="e-v1">SAR 0</span></div>
+      <div class="r"><span id="e-l2">Split in 4</span><span id="e-v2">0 items</span></div>
+      <div class="r tot"><span id="e-l3">You pay today</span><b id="e-v3">SAR 0</b></div>
+    </div>
+    <div class="four">
+      <div id="f1">TODAY<b id="f1v">—</b></div>
+      <div id="f2">IN 1 MO<b id="f2v">—</b></div>
+      <div id="f3">IN 2 MO<b id="f3v">—</b></div>
+      <div id="f4">IN 3 MO<b id="f4v">—</b></div>
+    </div>
+    <p class="sub" id="e-sub" style="margin-bottom:18px">0% interest. No fees.<br><small>Example terms, concept only.</small></p>
+    <button class="btn" onclick="cta('endcard')" id="e-btn">SHOP WITH TABBY</button>
+    <button class="ghost" onclick="reset()" id="e-again">Play again</button>
+  </section>
+
+  <div class="foot" id="disc">Spec playable by Mahmoud Anwar · concept only, not an official Tabby ad</div>
+</div>
+
+<script>
+const STORE_URL='https://tabby.ai/';
+const DURATION=15000;
+
+const T={
+ en:{dir:'ltr',lang:'عربي',hcta:'Get Tabby',h1:'Cart too heavy?',sub:'Tap every price before it lands.<br>Watch it split into 4.',btn:'TAP TO PLAY',
+     hint:'👆 Tap the prices',ground:'paid in full 😬',cur:'SAR',split:'split',today:'Today',
+     eh2:'Nice splitting! 🎉',eh2b:'Tabby would have caught them all 😉',l1:'Cart total',l2:'You split',l3:'With Tabby, today',items:'items',
+     f:['TODAY','IN 1 MO','IN 2 MO','IN 3 MO'],esub:'0% interest. No fees.<br><small>Example terms, concept only.</small>',
+     ebtn:'SHOP WITH TABBY',again:'Play again',
+     disc:'Spec playable by Mahmoud Anwar · concept only, not an official Tabby ad'},
+ ar:{dir:'rtl',lang:'EN',hcta:'حمّل تابي',h1:'السلة تقيلة؟',sub:'دوس على كل سعر قبل ما يقع.<br>شوفه بينقسم ٤.',btn:'دوس عشان تلعب',
+     hint:'👆 دوس على الأسعار',ground:'اتدفع كامل 😬',cur:'ر.س',split:'اتقسم',today:'النهاردة',
+     eh2:'تقسيم ممتاز! 🎉',eh2b:'تابي كانت هتمسكهم كلهم 😉',l1:'إجمالي السلة',l2:'قسّمت',l3:'مع تابي، النهاردة',items:'منتج',
+     f:['النهاردة','بعد شهر','بعد شهرين','بعد ٣ شهور'],esub:'بدون فوايد. بدون رسوم.<br><small>شروط توضيحية، مجرد مفهوم.</small>',
+     ebtn:'تسوّق مع تابي',again:'العب تاني',
+     disc:'Playable تجريبية من محمود أنور · مجرد مفهوم، مش إعلان رسمي لتابي'}
+};
+let L='en';
+
+const $=id=>document.getElementById(id);
+const ad=$('ad'), field=$('field');
+let prices=[], total=0, splitCount=0, today=0, running=false, t0=0, lastSpawn=0, raf=0;
+
+function paint(){
+  const t=T[L];
+  document.documentElement.lang=L; ad.dir=t.dir;
+  $('langb').textContent=t.lang; $('hcta').textContent=t.hcta;
+  $('i-h1').textContent=t.h1; $('i-sub').innerHTML=t.sub; $('i-btn').textContent=t.btn;
+  $('hint').textContent=t.hint; $('groundlbl').textContent=t.ground;
+  $('e-h2').textContent=t.eh2; $('e-l1').textContent=t.l1; $('e-l2').textContent=t.l2; $('e-l3').textContent=t.l3;
+  t.f.forEach((s,i)=>{const el=$('f'+(i+1)); el.childNodes[0].nodeValue=s;});
+  $('e-sub').innerHTML=t.esub; $('e-btn').textContent=t.ebtn; $('e-again').textContent=t.again;
+  $('disc').textContent=t.disc;
+  hud();
+}
+function setLang(){L=(L==='en')?'ar':'en';paint();}
+
+function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');}
+function cta(){ try{ if(window.mraid&&mraid.open){mraid.open(STORE_URL);return;} }catch(e){} window.open(STORE_URL,'_blank'); }
+
+function start(){
+  prices.forEach(p=>p.el.remove()); prices=[];
+  total=0; splitCount=0; today=0; running=true; t0=performance.now(); lastSpawn=-900;
+  $('hint').style.opacity=1; hud(); go('game'); raf=requestAnimationFrame(loop);
+}
+function reset(){ go('s-intro'); }
+
+function spawn(){
+  const w=ad.clientWidth;
+  const val=(2+Math.floor(Math.random()*9))*50;           // 100 .. 500
+  const el=document.createElement('div'); el.className='price';
+  el.innerHTML=T[L].cur+' '+val+'<small>TAP TO SPLIT</small>';
+  field.appendChild(el);
+  const bw=el.offsetWidth||110;
+  const p={el,x:16+Math.random()*Math.max(10,w-bw-32),y:-70,v:1.5+Math.random()*1.1,val,done:false};
+  el.style.transform='translate('+p.x+'px,'+p.y+'px)';
+  el.addEventListener('pointerdown',ev=>{ev.stopPropagation();split(p);});
+  prices.push(p);
+}
+function split(p){
+  if(p.done||!running)return; p.done=true;
+  const q=Math.round(p.val/4);
+  total+=p.val; splitCount++; today+=q;
+  for(let i=0;i<4;i++){
+    const c=document.createElement('div'); c.className='chunk';
+    c.textContent=T[L].cur+' '+q;
+    c.style.transform='translate('+p.x+'px,'+p.y+'px)';
+    field.appendChild(c);
+    const dx=(i-1.5)*46, dy=34+i*7;
+    c.animate([{transform:'translate('+p.x+'px,'+p.y+'px)',opacity:1},
+               {transform:'translate('+(p.x+dx)+'px,'+(p.y+dy)+'px)',opacity:0}],
+              {duration:620,easing:'cubic-bezier(.2,.7,.3,1)'});
+    setTimeout(()=>c.remove(),620);
+  }
+  p.el.remove(); prices=prices.filter(x=>x!==p);
+  hud();
+}
+function missed(p){
+  total+=p.val;
+  const m=document.createElement('div'); m.className='miss'; m.textContent='−'+T[L].cur+' '+p.val;
+  m.style.left=p.x+'px'; m.style.top=(ad.clientHeight-130)+'px'; field.appendChild(m);
+  setTimeout(()=>m.remove(),800);
+  today+=p.val;
+  p.el.remove(); prices=prices.filter(x=>x!==p);
+  hud();
+}
+function hud(){
+  const t=T[L];
+  $('splitlbl').textContent='✂️ '+splitCount+' '+t.split;
+  $('todaylbl').textContent=t.today+' '+t.cur+' '+today;
+}
+function loop(now){
+  if(!running)return;
+  const el=now-t0, left=Math.max(0,DURATION-el);
+  $('timefill').style.width=(left/DURATION*100)+'%';
+  if(now-lastSpawn>880-Math.min(380,el/40)){spawn();lastSpawn=now;}
+  const floor=ad.clientHeight-104;
+  for(let i=prices.length-1;i>=0;i--){
+    const p=prices[i]; p.y+=p.v*(1+el/DURATION*0.75);
+    p.el.style.transform='translate('+p.x+'px,'+p.y+'px)';
+    if(p.y>floor) missed(p);
+  }
+  if(left<=0){running=false;cancelAnimationFrame(raf);setTimeout(endcard,420);return;}
+  raf=requestAnimationFrame(loop);
+}
+function endcard(){
+  prices.forEach(p=>p.el.remove()); prices=[];
+  // The offer never depends on how well the round went: Tabby always splits the cart in 4.
+  const t=T[L], per=Math.round(total/4);
+  $('e-h2').textContent=splitCount>=3?t.eh2:t.eh2b;
+  $('e-v1').textContent=t.cur+' '+total;
+  $('e-v2').textContent=splitCount+' '+t.items;
+  $('e-v3').textContent=t.cur+' '+per;
+  ['f1v','f2v','f3v','f4v'].forEach(id=>$(id).textContent=t.cur+' '+per);
+  go('s-end');
+}
+$('game').addEventListener('pointerdown',()=>{$('hint').style.opacity=0;});
+paint();
+</script>
+</body>
+</html>
