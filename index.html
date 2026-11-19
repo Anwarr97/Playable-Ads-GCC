@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Playable Ads in the GCC</title>
+<meta name="description" content="A plan for building awareness of non-gaming playable ads among GCC brands — with five working spec playables and a break-even calculator.">
+<meta property="og:title" content="Playable Ads in the GCC">
+<meta property="og:description" content="Five working spec playables, a break-even calculator, and a 90-day plan. By Mahmoud Anwar.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one reading column, numbered sections, and a playable you can actually use sitting in the middle of the argument. */
+:root{
+  --bg:#0C0F16; --panel:#141926; --panel2:#1A2130; --line:#283044;
+  --fg:#E6EBF3; --head:#F6F9FF; --muted:#8E9BB3; --faint:#5D6880;
+  --play:#FF6A2B; --play2:#FF9359; --soft:rgba(255,106,43,.12);
+  --good:#2BE08F; --bad:#FF4D6A;
+  --display:"Sora",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:"Inter","Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.65;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 80px;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:780px;margin:0 auto}
+h1,h2,h3,.n,.stat b{font-family:var(--display);text-wrap:balance}
+h1{font-size:clamp(32px,6.4vw,52px);line-height:1.06;font-weight:800;letter-spacing:-.025em;margin:0 0 18px;color:var(--head)}
+h2{font-size:clamp(24px,4.2vw,32px);line-height:1.2;font-weight:700;letter-spacing:-.018em;margin:0 0 14px;color:var(--head)}
+h3{font-size:19px;font-weight:700;margin:0 0 8px;color:var(--head)}
+p{margin:0 0 16px}
+a{color:var(--play2)}
+strong{color:var(--head);font-weight:600}
+
+header{padding-block:56px 12px;border-bottom:1px solid var(--line)}
+.kicker{font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--play)}
+.lede{font-size:20px;color:var(--fg);max-width:60ch}
+.by{margin-top:26px;color:var(--faint);font-size:14.5px;line-height:1.7}
+.by b{color:var(--muted);font-weight:600}
+
+section{padding-block:52px;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:0}
+.n{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--play);
+  border:1.5px solid rgba(255,106,43,.4);background:var(--soft);border-radius:999px;padding:5px 14px;margin-bottom:18px}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:26px}
+.card+.card{margin-top:14px}
+.card h3{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.tag{font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:3px 8px}
+
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.two .card{margin-top:0}
+.who{border-top:3px solid var(--line)}
+.who.growth{border-top-color:var(--muted)}
+.who.brand{border-top-color:var(--play)}
+.who .role{font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.who.brand .role{color:var(--play)}
+.who p{font-size:16px;margin-bottom:10px}
+.who dl{margin:14px 0 0;font-size:15px}
+.who dt{font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-top:12px}
+.who dd{margin:3px 0 0}
+
+/* the playable demo */
+.demo{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:24px;margin-top:8px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.tabs button{flex:1 1 auto;min-width:110px;background:transparent;border:1.5px solid var(--line);color:var(--fg);
+  font:600 14.5px var(--body);padding:11px 12px;border-radius:10px;cursor:pointer;transition:border-color .15s,background .15s}
+.tabs button[aria-pressed="true"]{border-color:var(--play);background:var(--soft);color:var(--head);font-weight:700}
+.tabs button:focus-visible,.seg button:focus-visible,a:focus-visible{outline:2px solid var(--play);outline-offset:3px}
+.stage{display:flex;flex-direction:column;align-items:center;gap:16px}
+.device{width:100%;max-width:330px;aspect-ratio:330/660;background:#05070B;border:9px solid #222A3A;border-radius:40px;
+  overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.55);position:relative}
+.device iframe{width:100%;height:100%;border:0;display:block;background:#05070B}
+.caption{text-align:center;max-width:46ch}
+.caption b{display:block;font-family:var(--display);font-size:18px;color:var(--head);margin-bottom:4px}
+.caption span{font-size:15px;color:var(--muted)}
+.note{margin-top:18px;font-size:14.5px;color:var(--faint);text-align:center;line-height:1.6}
+
+/* calculator strip */
+.calc{display:block;background:linear-gradient(135deg,rgba(255,106,43,.14),rgba(255,106,43,.05));
+  border:2px solid rgba(255,106,43,.5);border-radius:18px;padding:28px;text-decoration:none;color:inherit}
+.calc .big{font-family:var(--display);font-size:clamp(26px,5vw,36px);font-weight:800;color:var(--play);line-height:1.1;margin-bottom:10px}
+.calc p{color:var(--fg);margin-bottom:0}
+.calc .go{display:inline-block;margin-top:16px;font-family:var(--display);font-weight:700;font-size:15px;color:var(--play2)}
+
+/* lists */
+ul.clean{list-style:none;padding:0;margin:0}
+ul.clean li{position:relative;padding-left:26px;margin-bottom:12px;font-size:16.5px}
+ul.clean li:before{content:"";position:absolute;left:0;top:11px;width:7px;height:7px;border-radius:50%;background:var(--play)}
+ul.clean li b{color:var(--head)}
+
+.seg{display:grid;gap:10px}
+.seg .row{display:grid;grid-template-columns:minmax(0,170px) minmax(0,1fr);gap:4px 18px;padding:14px 0;border-bottom:1px solid var(--line)}
+.seg .row:last-child{border-bottom:0}
+.seg .row b{font-family:var(--display);font-size:16px;color:var(--head);font-weight:700}
+.seg .row span{font-size:15.5px;color:var(--muted)}
+
+/* calendar */
+.cal{display:grid;gap:10px}
+.cal .m{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px;align-items:baseline;
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.cal .m b{font-family:var(--display);font-size:17px;color:var(--head)}
+.cal .m span{font-size:15px;color:var(--muted);grid-column:1/-1}
+.cal .m em{font-style:normal;font-family:var(--display);font-size:13px;font-weight:700;color:var(--play);white-space:nowrap}
+.cal .m.now{border-color:rgba(255,106,43,.55);background:var(--soft)}
+
+/* 90 days */
+.days{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.day{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px}
+.day .d{font-family:var(--display);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--play);margin-bottom:10px}
+.day ul{margin:0;padding-left:18px;font-size:15.5px;color:var(--muted)}
+.day li{margin-bottom:7px}
+.day li b{color:var(--fg);font-weight:600}
+
+table{width:100%;border-collapse:collapse;font-size:15.5px;margin-top:6px}
+th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--display);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+td b{color:var(--head)}
+.scroller{overflow-x:auto}
+
+.ask{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:26px}
+.ask ol{margin:0;padding-left:20px}
+.ask li{margin-bottom:14px;font-size:16.5px}
+.ask li b{color:var(--head)}
+
+footer{padding-block:48px 0;color:var(--muted);font-size:15px;line-height:1.75}
+footer b{color:var(--head);font-family:var(--display)}
+.disc{margin-top:26px;font-size:13.5px;color:var(--faint);line-height:1.65;border-top:1px solid var(--line);padding-top:20px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Playable Factory · GCC · November 2026</div>
+  <h1>An ad people play is easy to sell. The format isn't.</h1>
+  <p class="lede">A plan for putting non-gaming playables in front of GCC brands — and the first pieces of it, built rather than described. Five of the playables on this page are real. Play one.</p>
+  <p class="by"><b>Mahmoud Anwar</b> · Business Development, GCC &amp; Egypt<br>
+  Prepared for Nil Zor and Baran Aybars, following the GCC sales conversation.</p>
+</header>
+
+<section>
+  <div class="n">01 · THE DIAGNOSIS</div>
+  <h2>Nobody in the room owns the format.</h2>
+  <p>In the GCC, playables are bought almost entirely out of gaming user-acquisition budgets. That is a solved sale. The non-gaming sale is not, and the reason is structural rather than creative.</p>
+  <p>For a brand here, the money sits in two places, and neither one has a reason to buy a playable:</p>
+  <div class="two">
+    <div class="card">
+      <h3>Brand and marketing</h3>
+      <p>Plans in video, out-of-home and influencers, through a media agency in Riyadh or Dubai. A playable arrives looking like <strong>production</strong>, not media — a line item with no plan to sit in.</p>
+    </div>
+    <div class="card">
+      <h3>Growth and performance</h3>
+      <p>Buys on Meta, Google, TikTok and Snap against a CPA. A playable arrives looking like a <strong>creative experiment</strong> with uncertain inventory and a bigger build cost.</p>
+    </div>
+  </div>
+  <p style="margin-top:20px">So the format does not lose the argument. It never gets into one. Every conversation ends with genuine interest and no budget line, and that is the thing a GCC hire has to fix first.</p>
+</section>
+
+<section>
+  <div class="n">02 · THE FIX</div>
+  <h2>Stop selling playable ads.</h2>
+  <p>Sell two different things to two different buyers, and never put both in the same deck.</p>
+  <div class="two">
+    <div class="card who growth">
+      <div class="role">To the growth team</div>
+      <p>A performance creative that beats their best-performing video on cost per result. Nothing about games, nothing about engagement.</p>
+      <dl>
+        <dt>The proof</dt><dd>A pilot measured on their own numbers, against their own current best creative.</dd>
+        <dt>The first ask</dt><dd>One creative slot in an existing campaign — not a new budget.</dd>
+      </dl>
+    </div>
+    <div class="card who brand">
+      <div class="role">To the brand team</div>
+      <p>An owned, interactive asset for a season — a Ramadan game, a National Day game — that lives in the app and in social long after the media stops.</p>
+      <dl>
+        <dt>The proof</dt><dd><strong>Migros One</strong>: two million coupons redeemed in a quarter on zero media spend.</dd>
+        <dt>The first ask</dt><dd>A slot in next season's plan, pitched eight to ten weeks ahead.</dd>
+      </dl>
+    </div>
+  </div>
+  <p style="margin-top:20px">The second one is the opportunity. It is where the budgets actually are, it is the harder sale, and as far as I can tell nobody in the region is making it.</p>
+</section>
+
+<section>
+  <div class="n">03 · PROOF, NOT SLIDES</div>
+  <h2>Five playables. Four sectors. Play them here.</h2>
+  <p>Each one is a different mechanic, to show the format carries across verticals rather than suiting one. Each is a single HTML file under 17&nbsp;KB with no external assets, and each carries an Arabic–English toggle, which in this region is a selling point on its own.</p>
+
+  <div class="demo">
+    <div class="tabs" id="tabs">
+      <button data-src="playables/delivery-fillthebag.html" data-name="Fill the Bag · talabat" data-why="Delivery. Catch-and-collect: drag the bag, fill it, watch the basket build." aria-pressed="true">Delivery</button>
+      <button data-src="playables/fintech-tabby.html" data-name="Split It · Tabby" data-why="Fintech. Reaction: tap each falling price and watch it split into four payments.">Fintech</button>
+      <button data-src="playables/telco-stc.html" data-name="Speed Run · stc" data-why="Telco. Lane-dodge: steer your data past the congestion and grab the 5G.">Telco</button>
+      <button data-src="playables/tourism-riyadh.html" data-name="Pick Your Night · Riyadh Season" data-why="Tourism. Choose-then-match: pick a vibe, then grab only the tickets that fit it.">Tourism</button>
+      <button data-src="playables/delivery-riderrush.html" data-name="Rider Rush · talabat" data-why="Delivery, A/B variant. Same brief, different mechanic — this is what testing looks like.">A/B variant</button>
+    </div>
+    <div class="stage">
+      <div class="device"><iframe id="stageFrame" src="playables/delivery-fillthebag.html" title="Playable ad demo" loading="lazy"></iframe></div>
+      <div class="caption"><b id="capName">Fill the Bag · talabat</b><span id="capWhy">Delivery. Catch-and-collect: drag the bag, fill it, watch the basket build.</span></div>
+    </div>
+    <p class="note">All five are unofficial concepts, built by me and marked as such inside each ad. They exist to show the motion, not to represent any of these brands.</p>
+  </div>
+
+  <p style="margin-top:24px">One of these takes about a day. That is the whole outreach engine in section 05: instead of asking a brand for a meeting, you send them their own idea, already playable.</p>
+</section>
+
+<section>
+  <div class="n">04 · THE NUMBER NOBODY CAN AGREE ON</div>
+  <h2>A playable costs more to build and less per result.</h2>
+  <p>Every published benchmark for this format comes from a company that sells the format, and the claims run from <strong>+32%</strong> conversion lift to <strong>+319%</strong>. Quoting any single figure to a media buyer starts an argument instead of a meeting.</p>
+  <p>So I stopped quoting one. This calculator hands them a model instead: their budget, their market's CPM, their production costs, and the spend at which the extra build cost pays itself back. Every default is sourced and every one is editable, including the lift.</p>
+  <a class="calc" href="calculator.html">
+    <div class="big">Where does it flip?</div>
+    <p>Open the break-even calculator. At its sourced defaults — Liftoff's conservative +32%, AppAgent's build costs, GCC CPMs — the crossover lands around $4,375 of media spend.</p>
+    <span class="go">Run your own numbers →</span>
+  </a>
+</section>
+
+<section>
+  <div class="n">05 · THE ENGINE</div>
+  <h2>Thirty accounts, thirty playables.</h2>
+  <p>The outreach motion is the thing that makes this different from any other agency approach, and it is only possible because the build is cheap and fast.</p>
+  <ul class="clean">
+    <li><b>Pick 30 priority accounts</b> across delivery, fintech, telco, tourism and retail — named, with a reason each.</li>
+    <li><b>Build a spec playable for each one</b>, branded, fifteen seconds, Arabic. Send it as a link and a short screen recording.</li>
+    <li><b>Lead with the thing, not the meeting.</b> The email says "we built this for you, it works, here it is" — the meeting is what they ask for.</li>
+    <li><b>Run a breakfast roundtable</b> in Riyadh and one in Dubai for growth and marketing leads. Ten people who buy, not a hundred who browse.</li>
+    <li><b>Offer the pilot at a reduced rate</b> against agreed KPIs, measured on their numbers, in their account.</li>
+  </ul>
+  <p style="margin-top:20px">I already hold direct contacts at four named accounts from the case study — in delivery, telco, e-commerce and banking. Those are the first four conversations, and they do not need an introduction.</p>
+</section>
+
+<section>
+  <div class="n">06 · WHERE THE DEMAND IS</div>
+  <h2>Segments, and why each one.</h2>
+  <div class="seg">
+    <div class="row"><b>Delivery &amp; e-commerce</b><span>talabat, noon, Jahez, HungerStation, Careem, Namshi — highest creative volume in the region and the most ruthless about cost per order. They will test anything that moves CPA.</span></div>
+    <div class="row"><b>Fintech &amp; BNPL</b><span>Tabby, Tamara, STC Pay, the digital banks — fast growth, heavy performance spend, and a product whose core idea (split a payment, earn a reward) is already a game mechanic.</span></div>
+    <div class="row"><b>Telcos</b><span>stc, Mobily, Zain, e&amp;, du — the largest brand budgets in the market and the least differentiated creative. The format is a differentiator before it is a performance tool.</span></div>
+    <div class="row"><b>Tourism &amp; entertainment</b><span>Visit Saudi, Riyadh Season, the new destinations — enormous awareness budgets, a mandate to feel modern, and a seasonal calendar that is public a year ahead.</span></div>
+    <div class="row"><b>Retail, real estate, government</b><span>Slower, but the government awareness campaigns in particular have budget and a genuine need for engagement rather than reach.</span></div>
+  </div>
+</section>
+
+<section>
+  <div class="n">07 · CHANNELS</div>
+  <h2>Who to go through.</h2>
+  <div class="two">
+    <div class="card"><h3>Media agencies <span class="tag">priority</span></h3><p>Riyadh and Dubai. They hold the budgets and they decide what gets planned. One agency relationship is worth ten brand meetings, and it is the slowest thing to build, so it starts in month one.</p></div>
+    <div class="card"><h3>Platform teams</h3><p>Snapchat and TikTok MENA. Both have enormous Saudi reach and both want differentiated creative on their inventory — a shared interest worth formalising.</p></div>
+    <div class="card"><h3>Content</h3><p>Arabic case studies, a short GCC playable results report, and consistent LinkedIn posting. The point is to be the person in the region who writes about this format, so the inbound arrives pre-sold.</p></div>
+    <div class="card"><h3>Events</h3><p>LEAP, GITEX, Dubai Lynx, Seamless Middle East. Attending is weak; speaking is better; running a playable challenge on the stand is best, because it demonstrates the product in the only way that works.</p></div>
+  </div>
+  <p style="margin-top:20px">And the one nobody outside would think of: <strong>Tamatem's existing Saudi network</strong>. The group already has relationships in this market that the non-gaming side has never used.</p>
+</section>
+
+<section>
+  <div class="n">08 · THE CALENDAR IS THE PITCH</div>
+  <h2>Seasons are planned eight to ten weeks ahead.</h2>
+  <p>This region's spend concentrates into a handful of moments, and each has a date by which the plan is already locked. Selling into a season after that date is impossible, and before it is easy — which makes the calendar, not the product, the thing that sets the sales rhythm.</p>
+  <div class="cal">
+    <div class="m now"><b>Ramadan 2027</b><em>pitch now – December</em><span>The biggest advertising season in the region, and the one where CPMs rise most — Meta CPMs across the GCC averaged around 68% above normal in 2026. If Ramadan falls in February 2027, the planning window is open today and shuts before the new year.</span></div>
+    <div class="m"><b>Eid al-Fitr</b><em>pitch January</em><span>Sold with Ramadan, as the payoff moment of the same campaign rather than a separate buy.</span></div>
+    <div class="m"><b>Riyadh Season</b><em>pitch June – July</em><span>Runs October to March. Entertainment and tourism budgets with a mandate to feel current — the most natural home for an owned seasonal playable.</span></div>
+    <div class="m"><b>Saudi National Day · 23 September</b><em>pitch July</em><span>Fixed date, national scale, and heavily brand-led. A playable with a local idea behind it travels here.</span></div>
+    <div class="m"><b>White Friday</b><em>pitch September</em><span>Pure performance season. This is the growth team's pitch, not the brand team's: cost per order, nothing else.</span></div>
+  </div>
+  <p style="margin-top:20px">Each season gets a ready-made campaign concept built in advance, so the pitch is a working thing rather than a proposal to build one.</p>
+</section>
+
+<section>
+  <div class="n">09 · NINETY DAYS</div>
+  <h2>What I would actually do.</h2>
+  <div class="days">
+    <div class="day"><div class="d">Month 1 · prove</div><ul>
+      <li><b>Ramadan first</b> — the window is closing, so it leads, not the content plan</li>
+      <li>Target list of 30 accounts, named, with the reason and the contact</li>
+      <li>First 5 spec playables built</li>
+      <li>Two Arabic case studies written</li>
+      <li>First agency conversations in Riyadh</li>
+    </ul></div>
+    <div class="day"><div class="d">Month 2 · reach</div><ul>
+      <li>Outreach to all 30, each with their own playable</li>
+      <li>The GCC results report published</li>
+      <li>Snapchat and TikTok MENA teams engaged</li>
+      <li>Roundtable booked in Riyadh</li>
+    </ul></div>
+    <div class="day"><div class="d">Month 3 · close</div><ul>
+      <li>First pilots signed and running</li>
+      <li>One event or speaking slot</li>
+      <li>Dubai roundtable</li>
+      <li>Seasonal concepts ready for the next window</li>
+    </ul></div>
+  </div>
+  <div class="scroller">
+  <table>
+    <thead><tr><th>What gets measured</th><th>By day 90</th><th>Why this one</th></tr></thead>
+    <tbody>
+      <tr><td><b>First meetings booked</b></td><td>25–30</td><td>The only honest measure of whether the outreach motion works.</td></tr>
+      <tr><td><b>Pilots signed</b></td><td>3–5</td><td>A pilot is the real conversion. Everything before it is interest.</td></tr>
+      <tr><td><b>Agency relationships</b></td><td>2</td><td>Slow to build, and the thing that compounds after the 90 days end.</td></tr>
+      <tr><td><b>Spec playables shipped</b></td><td>30</td><td>Input, not outcome — but it is the input the whole plan depends on.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <div class="n">10 · WHAT I WOULD NEED</div>
+  <h2>Four things, none of them money.</h2>
+  <div class="ask">
+    <ol>
+      <li><b>Production capacity for spec builds.</b> Thirty playables in ninety days only works if Flex can turn a branded concept around in days. I need to know the real limit before I promise it to anyone.</li>
+      <li><b>A pricing floor I can quote.</b> Not a rate card — just the number below which a pilot stops making sense, so I can negotiate in a room without going back for approval.</li>
+      <li><b>Two or three non-gaming references I am allowed to name.</b> Migros One carries a lot, but a buyer always asks "who in my sector?" and right now I have nothing to answer with.</li>
+      <li><b>An introduction into Tamatem's Saudi network.</b> The relationships exist inside the group; the non-gaming side has never used them.</li>
+    </ol>
+  </div>
+</section>
+
+<footer>
+  <p><b>Mahmoud Anwar</b><br>
+  Business development, six years across the GCC and Egypt — digital solutions, EdTech, medical products, real estate and HR. Arabic and English.</p>
+  <p>I offered this while the GCC role is on hold, and I meant it without conditions: if any part of it is useful to the team as it stands, use it. I would rather be the person who already did the work than the person who described it.</p>
+  <p class="disc">The five playables here are unofficial concepts created by me for this document, and are marked as such inside each one. They are not affiliated with, endorsed by, or representative of talabat, Tabby, stc or Riyadh Season. Benchmark figures and their sources are listed inside the calculator; where a number is contested, the most conservative published figure is the one used.</p>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var tabs=document.getElementById('tabs');
+  var frame=document.getElementById('stageFrame');
+  var nm=document.getElementById('capName'), why=document.getElementById('capWhy');
+  tabs.addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    Array.prototype.forEach.call(tabs.querySelectorAll('button'),function(o){o.setAttribute('aria-pressed','false')});
+    b.setAttribute('aria-pressed','true');
+    frame.src=b.dataset.src;              // reload so each demo starts from its own intro
+    nm.textContent=b.dataset.name;
+    why.textContent=b.dataset.why;
+  });
+})();
+</script>
+</body>
+</html>
