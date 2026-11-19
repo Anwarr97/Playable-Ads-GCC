@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Speed Run – Playable Ad Concept for stc</title>
+<!-- Spec playable by Mahmoud Anwar. Sector: telco. Mechanic: lane-dodge (drag / steer).
+     Concept only — not an official stc ad. Single file, no external assets, MRAID-aware CTA. -->
+<style>
+  :root{--purple:#4F008C;--purple2:#6D1FB8;--glow:#B47CFF;--ink:#140824;--night:#1B0B2E;--cream:#F7F2FF;--mint:#2BE0B6;--warn:#FF5E7A;--muted:#A48FC4}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none}
+  html,body{height:100%;background:#0A0414;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#fff;overflow:hidden}
+  #ad{position:relative;width:100vw;height:100vh;max-width:430px;max-height:932px;margin:0 auto;background:radial-gradient(130% 80% at 50% 0%,#2E0F52 0%,var(--night) 45%,#0E0520 100%);overflow:hidden}
+  header{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:20}
+  .brand{font-weight:800;font-size:23px;letter-spacing:-.5px;color:#fff}
+  .brand i{color:var(--glow);font-style:normal}
+  .right{display:flex;align-items:center;gap:8px}
+  .lang{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.25);color:#fff;border-radius:16px;padding:6px 11px;font-weight:800;font-size:12px;cursor:pointer}
+  .mini-cta{background:var(--glow);color:var(--ink);border:none;border-radius:20px;padding:8px 14px;font-weight:800;font-size:13px;cursor:pointer}
+  .screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:72px 22px 28px;text-align:center}
+  .screen.on{display:flex}
+  h1{font-size:33px;line-height:1.12;font-weight:800;margin-bottom:12px}
+  h2{font-size:26px;font-weight:800;margin-bottom:14px}
+  p.sub{font-size:16px;color:var(--muted);margin-bottom:26px;line-height:1.45}
+  .big{font-size:76px;margin-bottom:12px;animation:bob 1.7s ease-in-out infinite;filter:drop-shadow(0 0 22px rgba(180,124,255,.55))}
+  @keyframes bob{50%{transform:translateY(-11px)}}
+  .btn{background:var(--glow);color:var(--ink);border:none;border-radius:30px;padding:16px 34px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 6px 0 #7B43C9;animation:pulse 1.25s ease-in-out infinite}
+  @keyframes pulse{50%{transform:scale(1.06)}}
+  .ghost{background:none;border:none;color:var(--muted);font-size:15px;font-weight:700;margin-top:14px;cursor:pointer;text-decoration:underline}
+  .hand{font-size:36px;margin-top:16px;animation:swipe 1.1s ease-in-out infinite}
+  @keyframes swipe{50%{transform:translateX(26px)}}
+  /* game */
+  #game{padding:0;justify-content:flex-start}
+  #hud{position:absolute;top:58px;left:14px;right:14px;z-index:8}
+  #timebar{height:10px;background:rgba(255,255,255,.14);border-radius:6px;overflow:hidden}
+  #timefill{height:100%;width:100%;background:linear-gradient(90deg,var(--glow),var(--mint));transition:width .1s linear}
+  #stats{display:flex;justify-content:space-between;margin-top:9px;font-weight:800;font-size:15px}
+  #speedlbl{color:var(--mint)}
+  #lanes{position:absolute;top:0;bottom:0;left:50%;width:330px;margin-left:-165px}
+  .lane{position:absolute;top:0;bottom:0;width:110px;border-left:1px dashed rgba(255,255,255,.1)}
+  .lane:last-child{border-right:1px dashed rgba(255,255,255,.1)}
+  #field{position:absolute;inset:0;overflow:hidden}
+  .ob{position:absolute;width:66px;height:66px;margin-left:-33px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:30px;will-change:transform}
+  .ob.block{background:rgba(255,94,122,.16);border:2.5px solid var(--warn)}
+  .ob.boost{background:rgba(43,224,182,.14);border:2.5px solid var(--mint);border-radius:50%}
+  #packet{position:absolute;width:62px;height:62px;margin-left:-31px;bottom:120px;border-radius:50%;background:linear-gradient(160deg,#fff,var(--glow));display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 0 26px rgba(180,124,255,.75);transition:left .13s cubic-bezier(.3,1.4,.5,1);z-index:5}
+  #packet.hit{animation:shake .32s}
+  @keyframes shake{25%{transform:translateX(-9px)}75%{transform:translateX(9px)}}
+  .pop{position:absolute;font-weight:800;font-size:17px;pointer-events:none;animation:rise .8s ease-out forwards}
+  @keyframes rise{to{transform:translateY(-46px);opacity:0}}
+  #hint{position:absolute;bottom:52px;left:0;right:0;font-weight:800;font-size:16px;color:#fff;transition:opacity .4s}
+  #trail{position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(180deg,rgba(14,5,32,0),rgba(14,5,32,.85))}
+  /* end */
+  .gauge{width:100%;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.14);border-radius:20px;padding:20px;margin-bottom:16px}
+  .gnum{font-size:52px;font-weight:800;color:var(--mint);line-height:1}
+  .gnum span{font-size:19px;color:var(--muted);font-weight:700}
+  .gbar{height:12px;background:rgba(255,255,255,.12);border-radius:7px;margin-top:14px;overflow:hidden}
+  .gbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--glow),var(--mint));border-radius:7px;transition:width 1.1s cubic-bezier(.2,.8,.3,1)}
+  .gl{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-weight:700;margin-top:7px;letter-spacing:.04em}
+  .offer{background:linear-gradient(135deg,var(--purple2),var(--glow));border-radius:18px;padding:15px;font-weight:800;font-size:18px;width:100%;margin-bottom:18px}
+  .offer small{display:block;font-size:11px;font-weight:600;opacity:.8;margin-top:4px}
+  .foot{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:10px;color:rgba(255,255,255,.3);padding:0 16px;line-height:1.35;z-index:30}
+</style>
+</head>
+<body>
+<div id="ad">
+  <header>
+    <div class="brand">stc<i>.</i></div>
+    <div class="right">
+      <button class="lang" onclick="setLang()" id="langb">عربي</button>
+      <button class="mini-cta" onclick="cta('header')" id="hcta">Upgrade</button>
+    </div>
+  </header>
+
+  <section class="screen on" id="s-intro">
+    <div class="big">⚡</div>
+    <h1 id="i-h1">Buffering again?</h1>
+    <p class="sub" id="i-sub">Steer your data through the fast lane.<br>Dodge the jams, grab the 5G.</p>
+    <button class="btn" onclick="start()" id="i-btn">TAP TO PLAY</button>
+    <div class="hand">👈👉</div>
+  </section>
+
+  <section class="screen" id="game">
+    <div id="hud">
+      <div id="timebar"><div id="timefill"></div></div>
+      <div id="stats"><span id="distlbl">📶 0 MB</span><span id="speedlbl">0 Mbps</span></div>
+    </div>
+    <div id="lanes"><div class="lane" style="left:0"></div><div class="lane" style="left:110px"></div><div class="lane" style="left:220px"></div></div>
+    <div id="field"></div>
+    <div id="trail"></div>
+    <div id="packet">📦</div>
+    <div id="hint">👈 Drag to switch lanes 👉</div>
+  </section>
+
+  <section class="screen" id="s-end">
+    <h2 id="e-h2">Top speed reached! ⚡</h2>
+    <div class="gauge">
+      <div class="gnum" id="e-speed">0 <span>Mbps</span></div>
+      <div class="gbar"><i id="e-bar"></i></div>
+      <div class="gl"><span id="e-gl1">your old plan</span><span id="e-gl2">stc 5G</span></div>
+    </div>
+    <div class="offer" id="e-offer">Double your speed, same price<small>Example offer, concept only.</small></div>
+    <button class="btn" onclick="cta('endcard')" id="e-btn">SEE 5G PLANS</button>
+    <button class="ghost" onclick="reset()" id="e-again">Play again</button>
+  </section>
+
+  <div class="foot" id="disc">Spec playable by Mahmoud Anwar · concept only, not an official stc ad</div>
+</div>
+
+<script>
+const STORE_URL='https://www.stc.com.sa/';
+const DURATION=15000, LANES=[-110,0,110];
+
+const T={
+ en:{dir:'ltr',lang:'عربي',hcta:'Upgrade',h1:'Buffering again?',sub:'Steer your data through the fast lane.<br>Dodge the jams, grab the 5G.',
+     btn:'TAP TO PLAY',hint:'👈 Drag to switch lanes 👉',mb:'MB',mbps:'Mbps',
+     eh2:'Top speed reached! ⚡',eh2b:'Jammed up? 5G fixes that.',gl1:'your old plan',gl2:'stc 5G',
+     offer:'Double your speed, same price<small>Example offer, concept only.</small>',
+     ebtn:'SEE 5G PLANS',again:'Play again',
+     disc:'Spec playable by Mahmoud Anwar · concept only, not an official stc ad'},
+ ar:{dir:'rtl',lang:'EN',hcta:'ترقية',h1:'الفيديو واقف تاني؟',sub:'وجّه بياناتك في المسار السريع.<br>فُت الزحمة، والمس الـ 5G.',
+     btn:'دوس عشان تلعب',hint:'👈 اسحب عشان تغيّر المسار 👉',mb:'ميجا',mbps:'ميجابت/ث',
+     eh2:'وصلت أقصى سرعة! ⚡',eh2b:'زحمة؟ الـ 5G بيحلها.',gl1:'باقتك الحالية',gl2:'stc 5G',
+     offer:'ضاعف سرعتك بنفس السعر<small>عرض توضيحي، مجرد مفهوم.</small>',
+     ebtn:'شوف باقات 5G',again:'العب تاني',
+     disc:'Playable تجريبية من محمود أنور · مجرد مفهوم، مش إعلان رسمي لـ stc'}
+};
+let L='en';
+
+const $=id=>document.getElementById(id);
+const ad=$('ad'), field=$('field'), packet=$('packet');
+let obs=[], lane=1, speed=40, dist=0, best=40, running=false, t0=0, lastSpawn=0, raf=0, hitUntil=0;
+
+function paint(){
+  const t=T[L];
+  document.documentElement.lang=L; ad.dir=t.dir;
+  $('langb').textContent=t.lang; $('hcta').textContent=t.hcta;
+  $('i-h1').textContent=t.h1; $('i-sub').innerHTML=t.sub; $('i-btn').textContent=t.btn;
+  $('hint').textContent=t.hint;
+  $('e-gl1').textContent=t.gl1; $('e-gl2').textContent=t.gl2;
+  $('e-offer').innerHTML=t.offer; $('e-btn').textContent=t.ebtn; $('e-again').textContent=t.again;
+  $('disc').textContent=t.disc; hud();
+}
+function setLang(){L=(L==='en')?'ar':'en';paint();}
+function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');}
+function cta(){ try{ if(window.mraid&&mraid.open){mraid.open(STORE_URL);return;} }catch(e){} window.open(STORE_URL,'_blank'); }
+
+function setLane(i,byPlayer){
+  lane=Math.max(0,Math.min(2,i));
+  packet.style.left=(ad.clientWidth/2+LANES[lane])+'px';
+  if(byPlayer) $('hint').style.opacity=0;   // keep the hint up until they actually steer
+}
+function start(){
+  obs.forEach(o=>o.el.remove()); obs=[];
+  speed=40; dist=0; best=40; running=true; t0=performance.now(); lastSpawn=-700; hitUntil=0;
+  $('hint').style.opacity=1; setLane(1); hud(); go('game'); raf=requestAnimationFrame(loop);
+}
+function reset(){ go('s-intro'); }
+
+function spawn(){
+  const boost=Math.random()<0.34, li=Math.floor(Math.random()*3);
+  const el=document.createElement('div'); el.className='ob '+(boost?'boost':'block');
+  el.textContent=boost?'⚡':'🐌';
+  field.appendChild(el);
+  obs.push({el,li,y:-70,boost});
+}
+function pop(txt,color,x,y){
+  const p=document.createElement('div'); p.className='pop'; p.textContent=txt; p.style.color=color;
+  p.style.left=x+'px'; p.style.top=y+'px'; field.appendChild(p); setTimeout(()=>p.remove(),800);
+}
+function hud(){
+  const t=T[L];
+  $('distlbl').textContent='📶 '+Math.round(dist)+' '+t.mb;
+  $('speedlbl').textContent=Math.round(speed)+' '+t.mbps;
+}
+function loop(now){
+  if(!running)return;
+  const el=now-t0, left=Math.max(0,DURATION-el);
+  $('timefill').style.width=(left/DURATION*100)+'%';
+  if(now-lastSpawn>620-Math.min(260,el/55)){spawn();lastSpawn=now;}
+
+  const cx=ad.clientWidth/2, py=ad.clientHeight-120-31, fall=4.4+el/DURATION*3.4;
+  for(let i=obs.length-1;i>=0;i--){
+    const o=obs[i]; o.y+=fall;
+    o.el.style.transform='translate('+(cx+LANES[o.li])+'px,'+o.y+'px)';
+    if(!o.done && o.li===lane && o.y>py-46 && o.y<py+46){
+      o.done=true;
+      if(o.boost){ speed=Math.min(320,speed+28); best=Math.max(best,speed); pop('+28',getComputedStyle(document.documentElement).getPropertyValue('--mint'),cx+LANES[o.li]-20,o.y); }
+      else { speed=Math.max(18,speed-34); packet.classList.add('hit'); hitUntil=now+320; pop('−34','#FF5E7A',cx+LANES[o.li]-20,o.y); }
+      o.el.remove(); obs.splice(i,1); hud(); continue;
+    }
+    if(o.y>ad.clientHeight+80){o.el.remove();obs.splice(i,1);}
+  }
+  if(now>hitUntil) packet.classList.remove('hit');
+  dist+=speed/60; hud();
+  if(left<=0){running=false;cancelAnimationFrame(raf);setTimeout(endcard,420);return;}
+  raf=requestAnimationFrame(loop);
+}
+function endcard(){
+  obs.forEach(o=>o.el.remove()); obs=[];
+  const t=T[L];
+  $('e-h2').textContent=best>=160?t.eh2:t.eh2b;
+  $('e-speed').innerHTML=Math.round(best)+' <span>'+t.mbps+'</span>';
+  go('s-end');
+  // The bar always fills to the 5G promise, whatever the round scored.
+  requestAnimationFrame(()=>{ $('e-bar').style.width='0%'; setTimeout(()=>{$('e-bar').style.width='100%';},90); });
+}
+// steering: drag anywhere, or tap left / right half
+let dragFrom=null;
+ad.addEventListener('pointerdown',e=>{ if(!running)return; dragFrom=e.clientX; });
+ad.addEventListener('pointermove',e=>{
+  if(!running||dragFrom===null)return;
+  const d=e.clientX-dragFrom;
+  if(Math.abs(d)>34){ setLane(lane+(d>0?1:-1),true); dragFrom=e.clientX; }
+});
+ad.addEventListener('pointerup',e=>{
+  if(running&&dragFrom!==null&&Math.abs(e.clientX-dragFrom)<12){
+    setLane(e.clientX<ad.getBoundingClientRect().left+ad.clientWidth/2?lane-1:lane+1,true);
+  }
+  dragFrom=null;
+});
+window.addEventListener('keydown',e=>{ if(!running)return; if(e.key==='ArrowLeft')setLane(lane-1,true); if(e.key==='ArrowRight')setLane(lane+1,true); });
+paint();
+</script>
+</body>
+</html>
