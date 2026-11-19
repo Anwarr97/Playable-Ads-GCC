@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Pick Your Night – Playable Ad Concept for Riyadh Season</title>
+<!-- Spec playable by Mahmoud Anwar. Sector: tourism / entertainment. Mechanic: choose-then-match (tap the right ones).
+     Concept only — not an official Riyadh Season ad. Single file, no external assets, MRAID-aware CTA. -->
+<style>
+  :root{--gold:#E8C06A;--gold2:#C99A3C;--ink:#120E1C;--night:#1A1430;--deep:#0C0817;--cream:#FFF8EC;--good:#49D98A;--bad:#FF6B7D;--muted:#9D92B8}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none}
+  html,body{height:100%;background:#07040F;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--cream);overflow:hidden}
+  #ad{position:relative;width:100vw;height:100vh;max-width:430px;max-height:932px;margin:0 auto;background:linear-gradient(180deg,#241A44 0%,var(--night) 38%,var(--deep) 100%);overflow:hidden}
+  #stars{position:absolute;inset:0;pointer-events:none;opacity:.55}
+  .star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:tw 3s ease-in-out infinite}
+  @keyframes tw{50%{opacity:.15}}
+  #skyline{position:absolute;left:0;right:0;bottom:0;height:150px;pointer-events:none;opacity:.5}
+  header{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:20}
+  .brand{font-weight:800;font-size:17px;letter-spacing:.02em;color:var(--gold);line-height:1.1}
+  .brand small{display:block;font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.14em}
+  .right{display:flex;align-items:center;gap:8px}
+  .lang{background:rgba(255,255,255,.08);border:1.5px solid rgba(232,192,106,.35);color:var(--gold);border-radius:16px;padding:6px 11px;font-weight:800;font-size:12px;cursor:pointer}
+  .mini-cta{background:var(--gold);color:var(--ink);border:none;border-radius:20px;padding:8px 14px;font-weight:800;font-size:13px;cursor:pointer}
+  .screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:72px 22px 28px;text-align:center}
+  .screen.on{display:flex}
+  h1{font-size:33px;line-height:1.12;font-weight:800;margin-bottom:12px}
+  h2{font-size:25px;font-weight:800;margin-bottom:16px}
+  p.sub{font-size:16px;color:var(--muted);margin-bottom:26px;line-height:1.45}
+  .big{font-size:74px;margin-bottom:12px;animation:bob 1.8s ease-in-out infinite;filter:drop-shadow(0 0 20px rgba(232,192,106,.5))}
+  @keyframes bob{50%{transform:translateY(-10px)}}
+  .btn{background:var(--gold);color:var(--ink);border:none;border-radius:30px;padding:16px 34px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 6px 0 var(--gold2);animation:pulse 1.25s ease-in-out infinite}
+  @keyframes pulse{50%{transform:scale(1.06)}}
+  .ghost{background:none;border:none;color:var(--muted);font-size:15px;font-weight:700;margin-top:14px;cursor:pointer;text-decoration:underline}
+  .hand{font-size:36px;margin-top:16px;animation:tap 1s ease-in-out infinite}
+  @keyframes tap{50%{transform:translateY(9px) scale(.88)}}
+  /* pick */
+  .cards{display:flex;flex-direction:column;gap:12px;width:100%}
+  .card{display:flex;align-items:center;gap:15px;background:rgba(255,255,255,.06);border:2px solid rgba(232,192,106,.25);border-radius:18px;padding:15px 16px;font-size:18px;font-weight:800;cursor:pointer;text-align:left}
+  .card .e{font-size:36px}
+  .card small{display:block;font-weight:600;font-size:13px;color:var(--muted);margin-top:2px}
+  .card:active{border-color:var(--gold);background:rgba(232,192,106,.12)}
+  [dir="rtl"] .card{text-align:right}
+  /* game */
+  #game{padding:0;justify-content:flex-start}
+  #hud{position:absolute;top:58px;left:14px;right:14px;z-index:8}
+  #timebar{height:10px;background:rgba(255,255,255,.13);border-radius:6px;overflow:hidden}
+  #timefill{height:100%;width:100%;background:linear-gradient(90deg,var(--gold2),var(--gold));transition:width .1s linear}
+  #stats{display:flex;justify-content:space-between;margin-top:9px;font-weight:800;font-size:15px}
+  #goal{color:var(--gold)}
+  #field{position:absolute;inset:0;overflow:hidden}
+  .tk{position:absolute;width:88px;height:78px;margin-left:-44px;border-radius:14px;background:var(--cream);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:30px;line-height:1;cursor:pointer;will-change:transform;box-shadow:0 6px 18px rgba(0,0,0,.4)}
+  .tk b{font-size:9px;font-weight:800;letter-spacing:.1em;color:#6B6478}
+  .tk:before,.tk:after{content:"";position:absolute;width:14px;height:14px;background:var(--night);border-radius:50%;top:32px}
+  .tk:before{left:-7px} .tk:after{right:-7px}
+  .tk.gone{animation:poof .34s forwards}
+  @keyframes poof{to{transform:scale(.4) translateY(-30px);opacity:0}}
+  .pop{position:absolute;font-weight:800;font-size:18px;pointer-events:none;animation:rise .85s ease-out forwards}
+  @keyframes rise{to{transform:translateY(-52px);opacity:0}}
+  #slots{position:absolute;bottom:34px;left:0;right:0;display:flex;justify-content:center;gap:11px;z-index:6}
+  .slot{width:62px;height:50px;border-radius:12px;border:2px dashed rgba(232,192,106,.45);display:flex;align-items:center;justify-content:center;font-size:25px;background:rgba(0,0,0,.25)}
+  .slot.filled{border-style:solid;border-color:var(--gold);background:rgba(232,192,106,.16);animation:pop .3s}
+  @keyframes pop{50%{transform:scale(1.18)}}
+  #hint{position:absolute;bottom:102px;left:0;right:0;font-weight:800;font-size:16px;transition:opacity .4s}
+  /* end */
+  .pass{width:100%;background:var(--cream);color:var(--ink);border-radius:20px;padding:20px 18px;margin-bottom:18px;position:relative;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+  .pass:before,.pass:after{content:"";position:absolute;width:26px;height:26px;background:var(--deep);border-radius:50%;top:50%;margin-top:-13px}
+  .pass:before{left:-13px} .pass:after{right:-13px}
+  .pass .lbl{font-size:10px;font-weight:800;letter-spacing:.16em;color:#857C96}
+  .pass .big3{font-size:38px;letter-spacing:6px;margin:8px 0}
+  .pass .nm{font-size:19px;font-weight:800}
+  .pass .dash{border-top:2px dashed #DED4C4;margin:13px 0}
+  .pass .row{display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:#6B6478}
+  .offer{background:linear-gradient(135deg,var(--gold2),var(--gold));color:var(--ink);border-radius:16px;padding:14px;font-weight:800;font-size:17px;width:100%;margin-bottom:18px}
+  .offer small{display:block;font-size:11px;font-weight:600;opacity:.75;margin-top:4px}
+  .foot{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:10px;color:rgba(255,248,236,.3);padding:0 16px;line-height:1.35;z-index:30}
+</style>
+</head>
+<body>
+<div id="ad">
+  <div id="stars"></div>
+  <svg id="skyline" viewBox="0 0 430 150" preserveAspectRatio="none" aria-hidden="true">
+    <path fill="#0A0614" d="M0 150V96h22v-18h16v18h20V70h26v26h18V58h22v38h16v-22h20v22h24V44h20v52h18V76h22v20h20V62h24v34h16V84h22v12h22v-26h18v26h24v-14h21v68z"/>
+  </svg>
+
+  <header>
+    <div class="brand">RIYADH SEASON<small>MOSAM AL RIYADH</small></div>
+    <div class="right">
+      <button class="lang" onclick="setLang()" id="langb">عربي</button>
+      <button class="mini-cta" onclick="cta('header')" id="hcta">Tickets</button>
+    </div>
+  </header>
+
+  <section class="screen on" id="s-intro">
+    <div class="big">🎡</div>
+    <h1 id="i-h1">What's your kind of night?</h1>
+    <p class="sub" id="i-sub">Pick a vibe, then grab 3 matching tickets<br>before the night ends.</p>
+    <button class="btn" onclick="go('s-pick')" id="i-btn">TAP TO PLAY</button>
+    <div class="hand">👆</div>
+  </section>
+
+  <section class="screen" id="s-pick">
+    <h2 id="p-h2">Choose your night</h2>
+    <div class="cards">
+      <div class="card" onclick="pick('music')"><span class="e">🎤</span><div id="c1">Live music<small>Concerts and shows</small></div></div>
+      <div class="card" onclick="pick('rides')"><span class="e">🎢</span><div id="c2">Rides and games<small>Boulevard and theme parks</small></div></div>
+      <div class="card" onclick="pick('food')"><span class="e">🍽️</span><div id="c3">Food and lights<small>Restaurants and night markets</small></div></div>
+    </div>
+  </section>
+
+  <section class="screen" id="game">
+    <div id="hud">
+      <div id="timebar"><div id="timefill"></div></div>
+      <div id="stats"><span id="goal">🎟️ 0 / 3</span><span id="misslbl"></span></div>
+    </div>
+    <div id="field"></div>
+    <div id="hint">👆 Tap only your tickets</div>
+    <div id="slots"><div class="slot" id="sl0">?</div><div class="slot" id="sl1">?</div><div class="slot" id="sl2">?</div></div>
+  </section>
+
+  <section class="screen" id="s-end">
+    <h2 id="e-h2">Your night is booked! 🎉</h2>
+    <div class="pass">
+      <div class="lbl" id="e-lbl">RIYADH SEASON · NIGHT PASS</div>
+      <div class="big3" id="e-tickets">🎟️🎟️🎟️</div>
+      <div class="nm" id="e-name">Live music night</div>
+      <div class="dash"></div>
+      <div class="row"><span id="e-r1">Entry</span><span id="e-r2">Tonight · 8:00 PM</span></div>
+    </div>
+    <div class="offer" id="e-offer">3 tickets, 1 pass — 20% off<small>Example offer, concept only.</small></div>
+    <button class="btn" onclick="cta('endcard')" id="e-btn">BOOK MY NIGHT</button>
+    <button class="ghost" onclick="reset()" id="e-again">Play again</button>
+  </section>
+
+  <div class="foot" id="disc">Spec playable by Mahmoud Anwar · concept only, not an official Riyadh Season ad</div>
+</div>
+
+<script>
+const STORE_URL='https://riyadhseason.sa/';
+const DURATION=16000;
+const SETS={music:['🎤','🎸','🎧','🎹'],rides:['🎢','🎡','🎠','🕹️'],food:['🍽️','🍔','🧁','☕']};
+
+const T={
+ en:{dir:'ltr',lang:'عربي',hcta:'Tickets',h1:"What's your kind of night?",sub:'Pick a vibe, then grab 3 matching tickets<br>before the night ends.',
+     btn:'TAP TO PLAY',ph2:'Choose your night',
+     c1:'Live music<small>Concerts and shows</small>',c2:'Rides and games<small>Boulevard and theme parks</small>',c3:'Food and lights<small>Restaurants and night markets</small>',
+     hint:'👆 Tap only your tickets',oops:'oops!',
+     eh2:'Your night is booked! 🎉',eh2b:'Almost! Your pass is ready anyway 🎉',
+     lbl:'RIYADH SEASON · NIGHT PASS',r1:'Entry',r2:'Tonight · 8:00 PM',
+     names:{music:'Live music night',rides:'Rides and games night',food:'Food and lights night'},
+     offer:'3 tickets, 1 pass — 20% off<small>Example offer, concept only.</small>',
+     ebtn:'BOOK MY NIGHT',again:'Play again',
+     disc:'Spec playable by Mahmoud Anwar · concept only, not an official Riyadh Season ad'},
+ ar:{dir:'rtl',lang:'EN',hcta:'تذاكر',h1:'ليلتك شكلها إيه؟',sub:'اختار جوّك، وبعدين المس ٣ تذاكر تناسبه<br>قبل ما الليلة تخلص.',
+     btn:'دوس عشان تلعب',ph2:'اختار ليلتك',
+     c1:'حفلات حية<small>كونسيرت وعروض</small>',c2:'ألعاب ومغامرات<small>البوليفارد ومدن الملاهي</small>',c3:'أكل وأنوار<small>مطاعم وأسواق ليلية</small>',
+     hint:'👆 المس تذاكرك بس',oops:'أوبس!',
+     eh2:'ليلتك اتحجزت! 🎉',eh2b:'قربت! التذكرة جاهزة برضه 🎉',
+     lbl:'موسم الرياض · تذكرة الليلة',r1:'الدخول',r2:'الليلة · ٨:٠٠ م',
+     names:{music:'ليلة حفلات',rides:'ليلة ألعاب',food:'ليلة أكل وأنوار'},
+     offer:'٣ تذاكر، تذكرة واحدة — خصم ٢٠٪<small>عرض توضيحي، مجرد مفهوم.</small>',
+     ebtn:'احجز ليلتي',again:'العب تاني',
+     disc:'Playable تجريبية من محمود أنور · مجرد مفهوم، مش إعلان رسمي لموسم الرياض'}
+};
+let L='en';
+
+const $=id=>document.getElementById(id);
+const ad=$('ad'), field=$('field');
+let vibe='music', mine=[], tks=[], got=0, miss=0, running=false, t0=0, lastSpawn=0, raf=0;
+
+(function stars(){
+  const w=$('stars');
+  for(let i=0;i<46;i++){
+    const s=document.createElement('div'); s.className='star';
+    s.style.left=Math.random()*100+'%'; s.style.top=Math.random()*62+'%';
+    s.style.animationDelay=(Math.random()*3)+'s';
+    if(Math.random()<.25){s.style.width='3px';s.style.height='3px';}
+    w.appendChild(s);
+  }
+})();
+
+function paint(){
+  const t=T[L];
+  document.documentElement.lang=L; ad.dir=t.dir;
+  $('langb').textContent=t.lang; $('hcta').textContent=t.hcta;
+  $('i-h1').textContent=t.h1; $('i-sub').innerHTML=t.sub; $('i-btn').textContent=t.btn;
+  $('p-h2').textContent=t.ph2;
+  $('c1').innerHTML=t.c1; $('c2').innerHTML=t.c2; $('c3').innerHTML=t.c3;
+  $('hint').textContent=t.hint;
+  $('e-lbl').textContent=t.lbl; $('e-r1').textContent=t.r1; $('e-r2').textContent=t.r2;
+  $('e-name').textContent=t.names[vibe];
+  $('e-offer').innerHTML=t.offer; $('e-btn').textContent=t.ebtn; $('e-again').textContent=t.again;
+  $('disc').textContent=t.disc; hud();
+}
+function setLang(){L=(L==='en')?'ar':'en';paint();}
+function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');}
+function cta(){ try{ if(window.mraid&&mraid.open){mraid.open(STORE_URL);return;} }catch(e){} window.open(STORE_URL,'_blank'); }
+
+function pick(v){ vibe=v; mine=SETS[v]; go('game'); start(); }
+function reset(){ go('s-intro'); }
+
+function start(){
+  tks.forEach(k=>k.el.remove()); tks=[];
+  got=0; miss=0; running=true; t0=performance.now(); lastSpawn=-600;
+  [0,1,2].forEach(i=>{const s=$('sl'+i);s.className='slot';s.textContent='?';});
+  $('hint').style.opacity=1; hud(); raf=requestAnimationFrame(loop);
+}
+function others(){
+  return Object.keys(SETS).filter(k=>k!==vibe).reduce((a,k)=>a.concat(SETS[k]),[]);
+}
+function spawn(){
+  const w=ad.clientWidth, good=Math.random()<0.5;
+  const pool=good?mine:others();
+  const el=document.createElement('div'); el.className='tk';
+  el.innerHTML=pool[Math.floor(Math.random()*pool.length)]+'<b>TICKET</b>';
+  field.appendChild(el);
+  // keep consecutive tickets apart so they never stack into an unreadable clump
+  let x, tries=0;
+  do{ x=58+Math.random()*Math.max(10,w-116); tries++; }
+  while(tries<8 && tks.some(o=>Math.abs(o.x-x)<96 && o.y>ad.clientHeight-130));
+  const k={el,good,x,y:ad.clientHeight+80,
+           v:1.5+Math.random()*1.0,sway:Math.random()*6.28,done:false};
+  el.style.transform='translate('+k.x+'px,'+k.y+'px)';
+  el.addEventListener('pointerdown',ev=>{ev.stopPropagation();grab(k);});
+  tks.push(k);
+}
+function pop(txt,color,x,y){
+  const p=document.createElement('div'); p.className='pop'; p.textContent=txt; p.style.color=color;
+  p.style.left=x+'px'; p.style.top=y+'px'; field.appendChild(p); setTimeout(()=>p.remove(),850);
+}
+function grab(k){
+  if(k.done||!running)return; k.done=true;
+  $('hint').style.opacity=0;
+  if(k.good){
+    if(got<3){
+      const s=$('sl'+got); s.textContent=k.el.firstChild.textContent; s.className='slot filled';
+      got++; pop('+1','#49D98A',k.x-14,k.y);
+    }
+  } else { miss++; pop(T[L].oops,'#FF6B7D',k.x-18,k.y); }
+  k.el.classList.add('gone');
+  setTimeout(()=>{k.el.remove();},340);
+  tks=tks.filter(x=>x!==k);
+  hud();
+  if(got>=3){ running=false; cancelAnimationFrame(raf); setTimeout(endcard,560); }
+}
+function hud(){ $('goal').textContent='🎟️ '+got+' / 3'; $('misslbl').textContent=miss?('✖ '+miss):''; }
+function loop(now){
+  if(!running)return;
+  const el=now-t0, left=Math.max(0,DURATION-el);
+  $('timefill').style.width=(left/DURATION*100)+'%';
+  if(now-lastSpawn>940-Math.min(300,el/55)){spawn();lastSpawn=now;}
+  for(let i=tks.length-1;i>=0;i--){
+    const k=tks[i]; k.y-=k.v*(1+el/DURATION*0.55); k.sway+=0.045;
+    k.el.style.transform='translate('+(k.x+Math.sin(k.sway)*13)+'px,'+k.y+'px)';
+    if(k.y<-90){k.el.remove();tks.splice(i,1);}
+  }
+  if(left<=0){running=false;cancelAnimationFrame(raf);setTimeout(endcard,420);return;}
+  raf=requestAnimationFrame(loop);
+}
+function endcard(){
+  tks.forEach(k=>k.el.remove()); tks=[];
+  const t=T[L];
+  $('e-h2').textContent=got>=3?t.eh2:t.eh2b;
+  // The pass always shows three tickets: the offer does not punish a weak round.
+  $('e-tickets').textContent=mine.slice(0,3).join('');
+  $('e-name').textContent=t.names[vibe];
+  go('s-end');
+}
+paint();
+</script>
+</body>
+</html>
